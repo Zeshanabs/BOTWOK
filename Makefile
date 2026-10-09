@@ -18,9 +18,8 @@ down:
 logs:
 	docker compose logs -f --tail=100
 
-migrate:
+migrate: ## schema (tables, RLS) + job-queue schema, all via alembic
 	cd backend && uv run alembic upgrade head
-	cd backend && uv run procrastinate --app app.workers.app.procrastinate_app schema --apply || true
 
 seed:
 	cd backend && uv run python -m app.seed

@@ -18,6 +18,8 @@ make seed             # agent registry, prompt templates, demo workspace
 scripts/dev.sh        # api :8000, worker, scheduler, web :3000 (logs in .dev-logs/)
 ```
 
+If the API, worker or scheduler exits right after starting, read its `preflight.failed` log line: it names the problem and the command that fixes it (Postgres not reachable → `make up`; schema missing/out of date or job-queue schema missing → `make migrate`). The job-queue schema is part of the Alembic migrations, so `make migrate` is all that is needed after pulling.
+
 Open http://localhost:3000 and sign in with the seeded demo account (`demo@botwok.local` / `botwok-demo`), or create your own account (the first user owns the workspace). API docs: http://localhost:8000/api/docs. Mailpit (local email): http://localhost:8025.
 
 ## Configure AI and search providers
