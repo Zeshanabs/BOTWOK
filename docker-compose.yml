@@ -1,0 +1,105 @@
+name: botwok
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: botwok
+      POSTGRES_PASSWORD: botwok
+      POSTGRES_DB: botwok
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U botwok -d botwok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    volumes: ["redisdata:/data"]
+    command: ["redis-server", "--appendonly", "yes"]
+    networks: [internal]
+
+  s3:
+    # S3-compatible object store (SeaweedFS; MinIO images are not pullable from this machine's registries).
+    # Any access key/secret is accepted locally. Buckets are created by the API at startup.
+    image: chrislusf/seaweedfs:latest
+    command: ["server", "-s3", "-s3.port=9000", "-dir=/data", "-ip=s3", "-ip.bind=0.0.0.0", "-master.port=9333", "-volume.port=8081"]
+    ports: ["9000:9000", "9333:9333"]
+    volumes: ["s3data:/data"]
+    networks: [internal]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["8025:8025", "1025:1025"]
+    networks: [internal]
+
+  api:
+    build: { context: ., dockerfile: infrastructure/docker/backend.Dockerfile }
+    profiles: ["full"]
+    environment:
+      BOTWOK_PROCESS: api
+      DATABASE_URL: postgresql+asyncpg://botwok:botwok@postgres:5432/botwok
+      DATABASE_URL_SYNC: postgresql://botwok:botwok@postgres:5432/botwok
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://s3:9000
+      SMTP_HOST: mailpit
+    env_file: [.env]
+    ports: ["8000:8000"]
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_started }, s3: { condition: service_started } }
+    networks: [internal, egress]
+
+  worker:
+    build: { context: ., dockerfile: infrastructure/docker/backend.Dockerfile }
+    profiles: ["full"]
+    environment:
+      BOTWOK_PROCESS: worker
+      DATABASE_URL: postgresql+asyncpg://botwok:botwok@postgres:5432/botwok
+      DATABASE_URL_SYNC: postgresql://botwok:botwok@postgres:5432/botwok
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://s3:9000
+      SMTP_HOST: mailpit
+    env_file: [.env]
+    depends_on: [api]
+    networks: [internal, egress]
+
+  scheduler:
+    build: { context: ., dockerfile: infrastructure/docker/backend.Dockerfile }
+    profiles: ["full"]
+    environment:
+      BOTWOK_PROCESS: scheduler
+      DATABASE_URL: postgresql+asyncpg://botwok:botwok@postgres:5432/botwok
+      DATABASE_URL_SYNC: postgresql://botwok:botwok@postgres:5432/botwok
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT: http://s3:9000
+      SMTP_HOST: mailpit
+    env_file: [.env]
+    depends_on: [api]
+    networks: [internal]
+
+  frontend:
+    build: { context: ., dockerfile: infrastructure/docker/frontend.Dockerfile }
+    profiles: ["full"]
+    environment: { API_INTERNAL_URL: http://api:8000 }
+    ports: ["3000:3000"]
+    depends_on: [api]
+    networks: [internal]
+
+  searxng:
+    image: searxng/searxng:latest
+    profiles: ["local-search"]
+    ports: ["8080:8080"]
+    environment: { SEARXNG_BASE_URL: "http://localhost:8080/" }
+    volumes: ["./infrastructure/compose/searxng:/etc/searxng"]
+    networks: [egress]
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+  s3data: {}
+
+networks:
+  internal: {}
+  egress: {}

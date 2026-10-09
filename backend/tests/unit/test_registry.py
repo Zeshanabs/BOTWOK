@@ -1,0 +1,100 @@
+import pytest
+
+from app.config import settings
+from app.integrations.ai import registry as reg
+from app.integrations.ai.fake import FakeProvider
+
+
+def test_resolve_model_with_provider_prefix():
+    assert reg.resolve_model("anthropic/claude-sonnet-5-5") == ("anthropic", "claude-sonnet-5-5")
+    assert reg.resolve_model("openrouter/openai/gpt-5-mini") == ("openrouter", "openai/gpt-5-mini")
+    assert reg.resolve_model("local/llama3.1") == ("ollama", "llama3.1")
+
+
+def test_resolve_model_infers_provider():
+    assert reg.resolve_model("claude-haiku-4-5") == ("anthropic", "claude-haiku-4-5")
+    assert reg.resolve_model("gpt-5") == ("openai", "gpt-5")
+    assert reg.resolve_model("grok-4") == ("xai", "grok-4")
+    assert reg.resolve_model("gemini-2.5-flash") == ("google", "gemini-2.5-flash")
+    assert reg.resolve_model("qwen2.5:7b") == ("ollama", "qwen2.5:7b")
+
+
+def test_resolve_model_rejects_empty():
+    with pytest.raises(ValueError):
+        reg.resolve_model("")
+    with pytest.raises(ValueError):
+        reg.resolve_model("anthropic/")
+
+
+def test_default_routing_uses_settings():
+    r = reg.default_routing()
+    assert r["cheap"]["primary"] == settings.default_cheap_model
+    assert r["balanced"]["primary"] == settings.default_balanced_model
+    assert r["powerful"]["primary"] == settings.default_powerful_model
+    assert r["embeddings"]["primary"] == settings.default_embedding_model
+
+
+def test_merge_routing_overrides_and_fallbacks():
+    merged = reg.merge_routing(reg.default_routing(), {
+        "balanced": "openai/gpt-5-mini",
+        "powerful": {"primary": "xai/grok-4", "fallback": ["anthropic/claude-opus-5-5"]},
+        "per_agent": {"critic": "openai/gpt-5"},
+        "economy_mode": True,
+    })
+    assert merged["balanced"] == {"primary": "openai/gpt-5-mini", "fallback": []}
+    assert merged["powerful"]["primary"] == "xai/grok-4"
+    assert merged["powerful"]["fallback"] == ["anthropic/claude-opus-5-5"]
+    assert merged["cheap"]["primary"] == settings.default_cheap_model    # untouched
+    assert merged["per_agent"]["critic"]["primary"] == "openai/gpt-5"
+    assert merged["economy_mode"] is True
+
+
+def test_candidate_specs_honors_per_agent_and_economy():
+    routing = reg.merge_routing(reg.default_routing(), {
+        "powerful": {"primary": "anthropic/claude-opus-5-5", "fallback": ["openai/gpt-5"]},
+        "balanced": {"primary": "anthropic/claude-sonnet-5-5"},
+        "per_agent": {"writer": {"primary": "xai/grok-4", "fallback": ["anthropic/claude-opus-5-5"]}},
+    })
+    assert reg.candidate_specs(routing, "powerful") == ["anthropic/claude-opus-5-5", "openai/gpt-5"]
+    # per-agent override first, then tier primary + fallbacks, de-duplicated
+    assert reg.candidate_specs(routing, "powerful", "writer") == ["xai/grok-4", "anthropic/claude-opus-5-5", "openai/gpt-5"]
+    routing["economy_mode"] = True
+    assert reg.candidate_specs(routing, "powerful")[0] == "anthropic/claude-sonnet-5-5"   # dropped one tier
+
+
+async def test_get_routing_without_db_returns_defaults():
+    r = await reg.get_routing(None, None)
+    assert r["cheap"]["primary"] == settings.default_cheap_model
+
+
+def test_get_provider_caches_and_overrides():
+    reg.clear_provider_cache()
+    a = reg.get_provider("xai", "k1")
+    b = reg.get_provider("xai", "k1")
+    c = reg.get_provider("xai", "k2")
+    assert a is b and a is not c
+    assert a.name == "xai"
+    fake = FakeProvider(name="fake")
+    reg.register_provider("anthropic", fake)
+    try:
+        assert reg.get_provider("anthropic") is fake
+    finally:
+        reg.register_provider("anthropic", None)
+    with pytest.raises(ValueError):
+        reg.get_provider("nope")
+
+
+async def test_providers_for_tier_without_db(monkeypatch):
+    fake = FakeProvider(name="fake")
+    reg.register_provider("anthropic", fake)
+    try:
+        cands = await reg.providers_for_tier(None, None, "balanced", "research")
+        assert cands and cands[0][0] is fake
+    finally:
+        reg.register_provider("anthropic", None)
+
+
+def test_model_family():
+    assert reg.model_family("anthropic/claude-sonnet-5-5") == "claude"
+    assert reg.model_family("gpt-5") == "gpt"
+    assert reg.model_family("xai/grok-4") == "grok"

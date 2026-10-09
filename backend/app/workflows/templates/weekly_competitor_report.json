@@ -1,0 +1,121 @@
+{
+  "key": "weekly_competitor_report",
+  "name": "Weekly competitor monitoring + report",
+  "description": "Every Monday: sync every competitor profile, give the collectors an hour, compose a competitor report and notify the team.",
+  "category": "competitors",
+  "order": 3,
+  "requires_autonomous_actions": false,
+  "params": {
+    "cron": {
+      "type": "string",
+      "default": "0 7 * * 1",
+      "description": "When to run"
+    },
+    "timezone": {
+      "type": "string",
+      "default": null,
+      "description": "IANA timezone (default: the brand's)"
+    },
+    "collect_minutes": {
+      "type": "integer",
+      "default": 60,
+      "description": "Minutes to wait for the syncs"
+    }
+  },
+  "workflow": {
+    "name": "Weekly competitor monitoring + report",
+    "settings": {
+      "on_error": "notify",
+      "max_cost_usd": 5
+    },
+    "nodes": [
+      {
+        "key": "t",
+        "type": "trigger.cron",
+        "label": "Weekly",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "cron": "[[cron]]",
+          "timezone": "[[timezone]]"
+        }
+      },
+      {
+        "key": "sync",
+        "type": "action",
+        "label": "Sync competitors",
+        "position": {
+          "x": 0,
+          "y": 120
+        },
+        "config": {
+          "action": "competitors.sync",
+          "params": {}
+        }
+      },
+      {
+        "key": "collect",
+        "type": "wait",
+        "label": "Let the collectors run",
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "config": {
+          "minutes": "[[collect_minutes]]"
+        }
+      },
+      {
+        "key": "report",
+        "type": "action",
+        "label": "Compose report",
+        "position": {
+          "x": 0,
+          "y": 360
+        },
+        "config": {
+          "action": "report.generate",
+          "params": {
+            "kind": "competitor",
+            "title": "Weekly competitor report"
+          }
+        }
+      },
+      {
+        "key": "notify",
+        "type": "notification",
+        "label": "Notify",
+        "position": {
+          "x": 0,
+          "y": 480
+        },
+        "config": {
+          "title": "{{ steps.report.title }} is ready",
+          "body": "{{ steps.sync.competitors }} competitors monitored.",
+          "link": "/reports/{{ steps.report.report_id }}",
+          "severity": "info"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "t",
+        "to": "sync"
+      },
+      {
+        "from": "sync",
+        "to": "collect"
+      },
+      {
+        "from": "collect",
+        "to": "report"
+      },
+      {
+        "from": "report",
+        "to": "notify"
+      }
+    ]
+  }
+}

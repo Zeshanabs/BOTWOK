@@ -1,0 +1,28 @@
+# env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+backend/.coverage
+# node
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+# data
+data/
+pgdata/
+miniodata/
+# os/editor
+.DS_Store
+.idea/
+.vscode/
+.dev-logs/

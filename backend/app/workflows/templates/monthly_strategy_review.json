@@ -1,0 +1,149 @@
+{
+  "key": "monthly_strategy_review",
+  "name": "Monthly strategy review",
+  "description": "On the 1st of each month: break down last month's performance, have the analyst explain it, ask the strategist for next month's mix, compose a report and notify the team.",
+  "category": "strategy",
+  "order": 6,
+  "requires_autonomous_actions": false,
+  "params": {
+    "cron": {
+      "type": "string",
+      "default": "0 9 1 * *",
+      "description": "When to run"
+    },
+    "timezone": {
+      "type": "string",
+      "default": null,
+      "description": "IANA timezone (default: the brand's)"
+    }
+  },
+  "workflow": {
+    "name": "Monthly strategy review",
+    "settings": {
+      "on_error": "notify",
+      "max_cost_usd": 10
+    },
+    "nodes": [
+      {
+        "key": "t",
+        "type": "trigger.cron",
+        "label": "Monthly",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "cron": "[[cron]]",
+          "timezone": "[[timezone]]"
+        }
+      },
+      {
+        "key": "metrics",
+        "type": "analytics",
+        "label": "Pillar breakdown",
+        "position": {
+          "x": 0,
+          "y": 120
+        },
+        "config": {
+          "mode": "query",
+          "group_by": "pillar",
+          "metric": "engagement_rate",
+          "period_days": 30
+        }
+      },
+      {
+        "key": "insights",
+        "type": "analytics",
+        "label": "Analyst insights",
+        "position": {
+          "x": 0,
+          "y": 240
+        },
+        "config": {
+          "mode": "insights",
+          "period_days": 30,
+          "dimensions": [
+            "pillar",
+            "format",
+            "platform",
+            "hour"
+          ]
+        }
+      },
+      {
+        "key": "mix",
+        "type": "ai_agent",
+        "label": "Recommend next month's mix",
+        "position": {
+          "x": 0,
+          "y": 360
+        },
+        "config": {
+          "agent": "strategy",
+          "action": "recommend_mix",
+          "inputs": {
+            "period": "30d",
+            "insights": "{{ steps.insights.insights }}"
+          }
+        }
+      },
+      {
+        "key": "report",
+        "type": "generate",
+        "label": "Compose report",
+        "position": {
+          "x": 0,
+          "y": 480
+        },
+        "config": {
+          "kind": "report",
+          "report_kind": "custom",
+          "title": "Monthly strategy review",
+          "instructions": "Summarize last month's performance by pillar, the analyst's insights and the recommended content mix for next month.",
+          "inputs": {
+            "breakdown": "{{ steps.metrics.groups }}",
+            "insights": "{{ steps.insights.insights }}",
+            "mix": "{{ steps.mix.output }}"
+          }
+        }
+      },
+      {
+        "key": "notify",
+        "type": "notification",
+        "label": "Notify",
+        "position": {
+          "x": 0,
+          "y": 600
+        },
+        "config": {
+          "title": "Monthly strategy review is ready",
+          "link": "/reports/{{ steps.report.report_id }}",
+          "severity": "info"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "t",
+        "to": "metrics"
+      },
+      {
+        "from": "metrics",
+        "to": "insights"
+      },
+      {
+        "from": "insights",
+        "to": "mix"
+      },
+      {
+        "from": "mix",
+        "to": "report"
+      },
+      {
+        "from": "report",
+        "to": "notify"
+      }
+    ]
+  }
+}

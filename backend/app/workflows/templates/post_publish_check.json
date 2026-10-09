@@ -1,0 +1,25 @@
+{
+  "key": "post_publish_check",
+  "name": "Post-publish 7-day performance check → notify",
+  "description": "When a post is published, wait 7 days, read its platform's performance for the period and notify the team.",
+  "category": "analytics",
+  "order": 5,
+  "requires_autonomous_actions": false,
+  "params": {
+    "days": {"type": "integer", "default": 7, "description": "Days to wait after publishing"}
+  },
+  "workflow": {
+    "name": "Post-publish 7-day performance check",
+    "settings": {"on_error": "stop", "concurrency": "parallel"},
+    "nodes": [
+      {"key": "t", "type": "trigger.event", "label": "Post published", "position": {"x": 0, "y": 0}, "config": {"event": "PUBLISH_SUCCESS"}},
+      {"key": "w", "type": "wait", "label": "Wait", "position": {"x": 0, "y": 120}, "config": {"days": "[[days]]"}},
+      {"key": "m", "type": "analytics", "label": "Read performance", "position": {"x": 0, "y": 240},
+       "config": {"mode": "query", "metric": "engagement_rate", "period_days": "[[days]]", "platform": "{{ trigger.platform }}"}},
+      {"key": "n", "type": "notification", "label": "Notify", "position": {"x": 0, "y": 360},
+       "config": {"title": "[[days]]-day check: {{ trigger.platform or 'post' }} performance",
+                  "body": "{{ steps.m.posts }} post(s) in the period; engagement KPIs: {{ steps.m.kpis }}", "link": "/analytics", "severity": "info"}}
+    ],
+    "edges": [{"from": "t", "to": "w"}, {"from": "w", "to": "m"}, {"from": "m", "to": "n"}]
+  }
+}
