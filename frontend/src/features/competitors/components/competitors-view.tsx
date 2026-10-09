@@ -9,12 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { EmptyState } from "@/components/data/empty-state";
-import { AvailabilityBadge } from "@/components/data/availability-badge";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { CardGridSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { EmptyState } from "@/components/shared/empty-state";
+import { AvailabilityBadge } from "@/components/shared/availability-badge";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { CardGridSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { domainOf, fmtCompact, toNumber } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useSession } from "@/stores/session";
@@ -106,10 +106,10 @@ export function CompetitorsView() {
                   </div>
                   <div className="flex gap-4 text-xs text-muted-foreground">
                     <span>Posts/wk <span className="font-medium tabular-nums text-foreground">{c.posts_per_week != null ? Number(c.posts_per_week).toFixed(1) : "—"}</span></span>
-                    <span>Followers <span className="font-medium tabular-nums text-foreground">{fmtCompact(f)}</span>{c.followers_delta_30d != null && <span className={Number(c.followers_delta_30d) >= 0 ? "text-green-600" : "text-red-600"}> {Number(c.followers_delta_30d) >= 0 ? "▲" : "▼"}{Math.abs(Number(c.followers_delta_30d)).toFixed(1)}% 30d</span>}</span>
+                    <span>Followers <span className="font-medium tabular-nums text-foreground">{fmtCompact(f)}</span>{c.followers_delta_30d != null && <span className={Number(c.followers_delta_30d) >= 0 ? "text-success" : "text-destructive"}> {Number(c.followers_delta_30d) >= 0 ? "▲" : "▼"}{Math.abs(Number(c.followers_delta_30d)).toFixed(1)}% 30d</span>}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">{uniqueAvailability(c).map((a) => <AvailabilityBadge key={a} availability={a} />)}</div>
-                  {st.state === "failed" && st.error && <p className="text-xs text-red-700 dark:text-red-300">{st.error}</p>}
+                  {st.state === "failed" && st.error && <p className="text-xs text-destructive">{st.error}</p>}
                   <div className="flex gap-2 pt-1">
                     <Button asChild size="sm"><Link href={`${base}/${c.id}`}>Open</Link></Button>
                     {can.create && <Button size="sm" variant="outline" onClick={() => doSync(c)} disabled={st.state === "syncing" || (sync.isPending && sync.variables === c.id)}><RefreshCw className="h-3 w-3" /> {st.state === "failed" ? "Retry sync" : "Sync"}</Button>}

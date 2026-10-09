@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSocialAccounts, useWorkspacePath } from "@/features/common/hooks";
 import type { SocialAccount } from "@/features/common/types";
@@ -23,7 +23,7 @@ export function accountHealth(a: SocialAccount): { tone: "ok" | "warn" | "bad" |
   }
   return { tone: "ok", label: "ok" };
 }
-const DOT = { ok: "bg-emerald-500", warn: "bg-amber-500", bad: "bg-red-500", muted: "bg-zinc-400" };
+const DOT = { ok: "bg-success", warn: "bg-warning", bad: "bg-destructive", muted: "bg-zinc-400" };
 
 /** Per-platform account health strip (doc 24 §16): ok, rate-limited with reset, expiring, audit pending, broken. */
 export function AccountHealthStrip({ brandId, compact }: { brandId?: string | null; compact?: boolean }) {
@@ -42,7 +42,7 @@ export function AccountHealthStrip({ brandId, compact }: { brandId?: string | nu
             <PlatformIcon platform={a.platform} size={16} />
             <span className="max-w-[140px] truncate">{a.display_name}</span>
             <span className={cn("h-2 w-2 rounded-full", DOT[h.tone])} aria-hidden />
-            <span className={cn(h.tone === "bad" ? "text-red-600" : h.tone === "warn" ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground")}>{h.label}</span>
+            <span className={cn(h.tone === "bad" ? "text-destructive" : h.tone === "warn" ? "text-warning" : "text-muted-foreground")}>{h.label}</span>
             {h.tone === "bad" && <Link href={ws("settings/social-accounts")} className="text-primary hover:underline">Fix</Link>}
           </li>
         );

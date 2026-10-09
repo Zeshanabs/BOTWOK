@@ -2,8 +2,8 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from "@/components/data/page-header";
-import { QueryError } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { QueryError } from "@/components/shared/async-states";
 import { fmtRelative } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useAiSettings } from "../hooks";

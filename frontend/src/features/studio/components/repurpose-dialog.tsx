@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError } from "@/features/common/components/query-state";
 import { RunCard } from "@/features/common/components/run-card";
@@ -77,7 +77,7 @@ export function RepurposeDialog({ open, onOpenChange, content, preselect, onDone
           <DialogTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-ai" /> Repurpose “{content.title}”</DialogTitle>
           <DialogDescription>Create per-platform versions from the master. Each AI version records what changed and is re-validated against the platform rules.</DialogDescription>
         </DialogHeader>
-        {!hasBody && <p className="rounded-md bg-amber-50 p-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">The master has no body yet — write or generate it first.</p>}
+        {!hasBody && <p className="rounded-md bg-warning/[0.08] p-2 text-sm text-warning">The master has no body yet — write or generate it first.</p>}
         <div className="flex gap-2 text-sm" role="radiogroup" aria-label="Mode">
           {(["ai", "blank"] as const).map((m) => (
             <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)} className={`rounded-md border px-3 py-1.5 ${mode === m ? "border-primary bg-primary/5" : ""}`}>
@@ -110,8 +110,8 @@ export function RepurposeDialog({ open, onOpenChange, content, preselect, onDone
                     </td>
                     <td className="py-1.5 text-xs text-muted-foreground">
                       {rule.notes.slice(0, 2).join(" · ")}
-                      {needsMedia && <span className="ml-1 text-amber-700 dark:text-amber-300">· ⚠ needs a media asset</span>}
-                      {ex && t.checked && <span className="block text-amber-700 dark:text-amber-300">{mode === "ai" ? `⚠ ${p.label} version exists: regenerated text becomes a new version` : `${p.label} version exists — skipped`}</span>}
+                      {needsMedia && <span className="ml-1 text-warning">· ⚠ needs a media asset</span>}
+                      {ex && t.checked && <span className="block text-warning">{mode === "ai" ? `⚠ ${p.label} version exists: regenerated text becomes a new version` : `${p.label} version exists — skipped`}</span>}
                     </td>
                   </tr>
                 );
@@ -133,7 +133,7 @@ export function RepurposeDialog({ open, onOpenChange, content, preselect, onDone
           </div>
         )}
         {(content.status === "approved" || content.status === "needs_review") && mode === "ai" && (
-          <p className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300"><AlertTriangle className="h-3.5 w-3.5" /> New versions will need approval again; already scheduled posts keep their approved versions.</p>
+          <p className="flex items-center gap-2 text-xs text-warning"><AlertTriangle className="h-3.5 w-3.5" /> New versions will need approval again; already scheduled posts keep their approved versions.</p>
         )}
         {repurpose.error && problemCode(repurpose.error) !== "confirm_reapproval" && <QueryError error={repurpose.error} title="Repurpose was not started" notAvailableText="Repurposing isn't enabled on this backend yet." />}
         {runId && <RunCard runId={runId} title={`Repurposing to ${chosen.length} platform${chosen.length === 1 ? "" : "s"}`} onDone={onRunDone} />}

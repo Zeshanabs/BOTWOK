@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ListSkeleton } from "@/components/data/async-states";
+import { ListSkeleton } from "@/components/shared/async-states";
 import { TeamView } from "@/features/team/components/team-view";
 
 export default function TeamPage() {

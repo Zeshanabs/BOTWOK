@@ -12,11 +12,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EmptyState } from "@/components/data/empty-state";
-import { StatusChip } from "@/components/data/status-chip";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
-import { ListSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/data/async-states";
+import { EmptyState } from "@/components/shared/empty-state";
+import { StatusChip } from "@/components/shared/status-chip";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
+import { ListSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/shared/async-states";
 import { fmtDate, fmtRelative } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -134,7 +134,7 @@ export function NotificationsSection() {
   if (q.error) return <QueryError error={q.error} onRetry={() => q.refetch()} title="Couldn't load notifications" />;
   const items = q.data?.items ?? [];
   const unread = q.data?.unread ?? items.filter((n) => !n.read_at).length;
-  const sev: Record<string, string> = { error: "bg-red-500", warning: "bg-amber-500", success: "bg-green-500", info: "bg-blue-500" };
+  const sev: Record<string, string> = { error: "bg-destructive", warning: "bg-warning", success: "bg-success", info: "bg-info" };
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export function NotificationsSection() {
             const href = n.link ? (n.link.startsWith("/") && !n.link.startsWith("/w/") ? `/w/${slug}${n.link}` : n.link) : null;
             return (
               <li key={n.id} className={cn("flex items-start gap-3 p-3 text-sm", !n.read_at && "bg-accent/40")}>
-                <span className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read_at ? "bg-transparent" : sev[n.severity ?? "info"] ?? "bg-blue-500")} aria-label={n.read_at ? "Read" : "Unread"} />
+                <span className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read_at ? "bg-transparent" : sev[n.severity ?? "info"] ?? "bg-info")} aria-label={n.read_at ? "Read" : "Unread"} />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{href ? <Link href={href} className="hover:underline" onClick={() => !n.read_at && read.mutate(n.id)}>{n.title}</Link> : n.title}</p>
                   {n.body && <p className="text-muted-foreground">{n.body}</p>}

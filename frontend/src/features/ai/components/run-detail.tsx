@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StatusChip } from "@/components/data/status-chip";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { QueryError, errorMessage } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { QueryError, errorMessage } from "@/components/shared/async-states";
 import { fmtCompact, fmtDuration, fmtUsd, msSince } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,7 @@ function ToolCallRow({ c }: { c: ToolCall }) {
         <p><span className="font-mono font-medium">{c.tool_name}</span>{c.side_effect && <span className="ml-1 text-muted-foreground">· {c.side_effect.toLowerCase()}</span>}</p>
         {summary(c.args_summary) && <p className="truncate text-muted-foreground" title={summary(c.args_summary)}>args: {summary(c.args_summary)}</p>}
         {summary(c.result_summary) && <p className="truncate text-muted-foreground" title={summary(c.result_summary)}>result: {summary(c.result_summary)}</p>}
-        {c.error && <p className="text-red-600 dark:text-red-400">{c.error}</p>}
+        {c.error && <p className="text-destructive">{c.error}</p>}
       </div>
       <span className="tabular-nums text-muted-foreground">{fmtDuration(c.duration_ms)}</span>
     </li>
@@ -51,10 +51,10 @@ function StepCard({ task, calls, onRetry, canRetry }: { task: RunTask; calls: To
         {tokens > 0 && <span>{fmtCompact(tokens)} tok</span>}
         {task.cost_usd != null && <span>{fmtUsd(task.cost_usd, 4)}</span>}
         {task.sources_count != null && <span>{task.sources_count} sources</span>}
-        {task.requires_approval && <span className="text-amber-600">approval gate</span>}
+        {task.requires_approval && <span className="text-warning">approval gate</span>}
       </div>
       {task.output_summary && <p className="whitespace-pre-wrap">{task.output_summary}</p>}
-      {task.error && <p className="text-red-600 dark:text-red-400">{task.error}</p>}
+      {task.error && <p className="text-destructive">{task.error}</p>}
       <div>
         <p className="mb-1 flex items-center gap-1 font-medium"><Wrench className="h-3 w-3" /> Tool calls ({calls.length})</p>
         {calls.length ? <ul className="divide-y">{calls.map((c) => <ToolCallRow key={c.id} c={c} />)}</ul> : <p className="text-muted-foreground">No tool calls recorded for this step.</p>}
@@ -142,7 +142,7 @@ export function RunDetail({ runId, followUp }: { runId: string; followUp?: React
         )}
 
         {(run.status === "failed" || failedTasks.length > 0 || failedCalls.length > 0) && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100" role="alert">
+          <div className="rounded-lg border border-destructive/40 bg-destructive/[0.06] p-3 text-sm text-destructive" role="alert">
             <p className="flex items-center gap-1 font-semibold"><AlertTriangle className="h-4 w-4" /> What failed</p>
             <ul className="mt-1 space-y-1 text-xs">
               {failedTasks.map((t) => <li key={t.key}>Step {t.key} {t.agent ? `· ${t.agent}` : ""} — {t.label}{t.error ? `: ${t.error}` : ""}</li>)}
@@ -164,12 +164,12 @@ export function RunDetail({ runId, followUp }: { runId: string; followUp?: React
             return (
               <li key={t.key}>
                 <button type="button" aria-expanded={open} onClick={() => setExpanded((x) => ({ ...x, [t.key]: !open }))}
-                        className={cn("flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent", t.status === "failed" && "bg-red-50/60 dark:bg-red-950/20")}>
+                        className={cn("flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent", t.status === "failed" && "bg-destructive/[0.06]/60")}>
                   <TaskGlyph status={t.status} />
                   <span className="w-8 shrink-0 font-mono text-xs text-muted-foreground">{t.key}</span>
                   {t.agent && <Badge variant="outline" className="hidden sm:inline-flex">{t.agent}</Badge>}
                   <span className={cn("min-w-0 flex-1 truncate", t.status === "skipped" && "text-muted-foreground line-through")}>{t.label}</span>
-                  {t.status === "awaiting_approval" && <span className="text-xs text-amber-600">⏸ gate</span>}
+                  {t.status === "awaiting_approval" && <span className="text-xs text-warning">⏸ gate</span>}
                   <span className="text-xs tabular-nums text-muted-foreground">{t.duration_ms != null ? fmtDuration(t.duration_ms) : live ? `${fmtDuration(live)}…` : ""}</span>
                   {t.cost_usd != null && <span className="hidden w-16 text-right text-xs tabular-nums text-muted-foreground sm:inline">{fmtUsd(t.cost_usd)}</span>}
                   {open ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
@@ -198,7 +198,7 @@ export function RunDetail({ runId, followUp }: { runId: string; followUp?: React
       <aside className="min-w-0" aria-label="Run results">
         <Tabs value={currentTab} onValueChange={setTab}>
           <TabsList className="w-full">
-            <TabsTrigger value="actions" className={pendingActions.length ? "text-amber-700 dark:text-amber-300" : undefined}>Actions{actions.length ? ` ${pendingActions.length || actions.length}` : ""}</TabsTrigger>
+            <TabsTrigger value="actions" className={pendingActions.length ? "text-warning" : undefined}>Actions{actions.length ? ` ${pendingActions.length || actions.length}` : ""}</TabsTrigger>
             <TabsTrigger value="output">Output{deliverables.length ? ` ${deliverables.length}` : ""}</TabsTrigger>
             <TabsTrigger value="sources">Sources{sources.length ? ` ${sources.length}` : ""}</TabsTrigger>
             <TabsTrigger value="why">Why</TabsTrigger>

@@ -2,8 +2,8 @@
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/components/data/empty-state";
-import { ListSkeleton, QueryError } from "@/components/data/async-states";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ListSkeleton, QueryError } from "@/components/shared/async-states";
 import { fmtDate, toNumber } from "@/lib/formatters";
 import { platformMeta } from "@/lib/platforms";
 import { useCompetitorSnapshots } from "../hooks";

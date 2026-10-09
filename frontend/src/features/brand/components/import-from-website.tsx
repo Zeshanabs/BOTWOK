@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NotAvailable, errorMessage, isNotAvailable } from "@/components/data/async-states";
-import { FormError } from "@/components/data/form-errors";
+import { NotAvailable, errorMessage, isNotAvailable } from "@/components/shared/async-states";
+import { FormError } from "@/components/shared/form-errors";
 import { humanize, truncate } from "@/lib/formatters";
 import { RunProgress } from "@/features/ai/components/run-progress";
 import type { AiRun } from "@/features/ai/types";
@@ -210,7 +210,7 @@ export function ImportFromWebsite({ brandId, defaultUrl, onDone, onSkip, skipLab
               <Checkbox id={`prop-${p.key}`} checked={!!checked[p.key]} onCheckedChange={(c) => setChecked((s) => ({ ...s, [p.key]: !!c }))} className="mt-0.5" />
               <label htmlFor={`prop-${p.key}`} className="min-w-0 flex-1 cursor-pointer text-sm">
                 <span className="font-medium">{p.label}</span>
-                {p.confidence !== undefined && <span className={`ml-2 text-xs ${p.confidence < 0.6 ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground"}`}>confidence {Math.round(p.confidence * 100)}%</span>}
+                {p.confidence !== undefined && <span className={`ml-2 text-xs ${p.confidence < 0.6 ? "text-warning" : "text-muted-foreground"}`}>confidence {Math.round(p.confidence * 100)}%</span>}
                 <span className="mt-0.5 block break-words text-muted-foreground">{preview(p.value)}</span>
                 {p.sources?.length ? <span className="mt-0.5 block text-xs text-muted-foreground">{p.sources.length} source{p.sources.length === 1 ? "" : "s"}</span> : null}
               </label>

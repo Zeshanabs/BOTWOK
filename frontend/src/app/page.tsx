@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { refreshSession } from "@/lib/api";
 import { useSession } from "@/stores/session";
+import { AppLoading } from "@/components/layout/shell";
 
 export default function Home() {
   const router = useRouter();
@@ -17,5 +18,5 @@ export default function Home() {
       else router.replace("/login");
     })();
   }, [hydrated, workspaceSlug, router]);
-  return <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
+  return <AppLoading />;
 }

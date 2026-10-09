@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Bookmark, Globe, Heart, MessageCircle, MoreHorizontal, Repeat2, Send, Share2, ThumbsUp } from "lucide-react";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { platformMeta } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { MediaThumb } from "@/features/media/components/media-thumb";

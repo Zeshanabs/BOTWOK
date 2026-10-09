@@ -14,13 +14,13 @@ export function syncState(c: Competitor): { state: "syncing" | "failed" | "synce
 export function SyncBadge({ competitor }: { competitor: Competitor }) {
   const s = syncState(competitor);
   if (s.state === "syncing") {
-    return <span className="inline-flex items-center gap-1 text-xs text-blue-700 dark:text-blue-300"><Loader2 className="h-3 w-3 animate-spin motion-reduce:animate-none" /> syncing{s.progress != null ? ` ${Math.round(s.progress <= 1 ? s.progress * 100 : s.progress)}%` : "…"}</span>;
+    return <span className="inline-flex items-center gap-1 text-xs text-info"><Loader2 className="h-3 w-3 animate-spin motion-reduce:animate-none" /> syncing{s.progress != null ? ` ${Math.round(s.progress <= 1 ? s.progress * 100 : s.progress)}%` : "…"}</span>;
   }
   if (s.state === "failed") {
-    return <span className="inline-flex items-center gap-1 text-xs text-red-700 dark:text-red-300" title={s.error ?? undefined}><X className="h-3 w-3" /> sync failed</span>;
+    return <span className="inline-flex items-center gap-1 text-xs text-destructive" title={s.error ?? undefined}><X className="h-3 w-3" /> sync failed</span>;
   }
   if (s.state === "synced") {
-    return <span className="inline-flex items-center gap-1 text-xs text-green-700 dark:text-green-300"><Check className="h-3 w-3" /> synced {fmtRelative(competitor.last_synced_at)}</span>;
+    return <span className="inline-flex items-center gap-1 text-xs text-success"><Check className="h-3 w-3" /> synced {fmtRelative(competitor.last_synced_at)}</span>;
   }
   return <span className="text-xs text-muted-foreground">not synced yet</span>;
 }

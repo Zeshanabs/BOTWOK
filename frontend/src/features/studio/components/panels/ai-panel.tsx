@@ -71,7 +71,7 @@ export function AiPanel({ content, variant, dirty, onBeforeRun, pendingSources =
         {meta && (meta.model || meta.agent) && <AiBadge meta={meta} label={meta.agent ?? "AI"} />}
       </div>
       {pendingSources.length > 0 && <p className="rounded-md border border-dashed p-2 text-xs">Next run will use {pendingSources.length} selected source{pendingSources.length === 1 ? "" : "s"}: {pendingSources.map((s) => s.title).join("; ")}</p>}
-      {dirty && <p className="rounded-md bg-amber-50 p-2 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">Unsaved edits are saved first so the AI works from your latest text.</p>}
+      {dirty && <p className="rounded-md bg-warning/[0.08] p-2 text-xs text-warning">Unsaved edits are saved first so the AI works from your latest text.</p>}
       {empty && <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">Nothing written yet. Add instructions (or rely on the title and brief) and press <strong>Write</strong> to draft it.</p>}
       <div className="grid grid-cols-2 gap-2">
         {ACTIONS.map((a) => (

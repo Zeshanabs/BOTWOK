@@ -5,7 +5,7 @@ import { Copy, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryError } from "@/components/data/async-states";
+import { QueryError } from "@/components/shared/async-states";
 import { fmtCompact } from "@/lib/formatters";
 import { useBrandContext } from "../hooks";
 

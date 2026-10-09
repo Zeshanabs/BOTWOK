@@ -6,8 +6,8 @@ import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Shield
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { AiBadge, CostPill } from "@/features/common/components/ai-badge";
 import { QueryError } from "@/features/common/components/query-state";
 import { useWorkspacePath } from "@/features/common/hooks";
@@ -102,7 +102,7 @@ export function ApprovalDetail({ id, onDecide, deciding, canDecide, position, on
                 ? <div className="mx-auto max-w-[520px]"><PlatformPreview platform={v?.platform ?? "linkedin"} format={v?.format} text={text} hashtags={v?.hashtags ?? content.body?.hashtags} segments={segs.length && v?.format !== "carousel" ? segs : undefined} media={media} title={typeof v?.platform_metadata?.title === "string" ? v.platform_metadata.title : content.title} /></div>
                 : <pre className="whitespace-pre-wrap rounded-md border bg-muted/40 p-3 font-sans text-sm">{segs.length ? segs.join("\n\n— — —\n\n") : text}{(v?.hashtags ?? []).length ? `\n\n${v?.hashtags?.join(" ")}` : ""}</pre>}
               {(v?.changes_made ?? []).length > 0 && <p className="text-xs text-muted-foreground"><Sparkles className="mr-1 inline h-3 w-3 text-ai" />Changes from master: {v?.changes_made?.join("; ")}</p>}
-              {valErrors.length > 0 && <ul className="rounded-md border border-red-300 bg-red-50 p-2 text-xs text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">{valErrors.map((e, i) => <li key={i}>✗ {e}</li>)}</ul>}
+              {valErrors.length > 0 && <ul className="rounded-md border border-destructive/40 bg-destructive/[0.06] p-2 text-xs text-destructive">{valErrors.map((e, i) => <li key={i}>✗ {e}</li>)}</ul>}
 
               <div className="grid gap-4 md:grid-cols-2">
                 <section className="rounded-lg border p-3">
@@ -115,7 +115,7 @@ export function ApprovalDetail({ id, onDecide, deciding, canDecide, position, on
                   <h3 className="mb-2 text-sm font-medium">Fact-check</h3>
                   {claims.length === 0 ? <p className="text-xs text-muted-foreground">No claims checked.</p> : (
                     <>
-                      <p className="text-sm"><span className="text-emerald-700 dark:text-emerald-300">{count("supported")} ✓</span> · <span className="text-amber-700 dark:text-amber-300">{count("unverifiable")} ? unverified</span> · <span className="text-red-700 dark:text-red-300">{count("contradicted")} ✗ contradicted</span></p>
+                      <p className="text-sm"><span className="text-success">{count("supported")} ✓</span> · <span className="text-warning">{count("unverifiable")} ? unverified</span> · <span className="text-destructive">{count("contradicted")} ✗ contradicted</span></p>
                       <Button size="xs" variant="ghost" className="mt-1" onClick={() => setShowClaims((s) => !s)}><ChevronDown className={cn(showClaims && "rotate-180")} /> {showClaims ? "Hide" : "View"} claims</Button>
                       {showClaims && <div className="mt-2"><ClaimVerdicts claims={claims} /></div>}
                     </>
@@ -162,7 +162,7 @@ export function ApprovalDetail({ id, onDecide, deciding, canDecide, position, on
       {pending && (
         <div className="sticky bottom-0 z-10 space-y-2 border-t bg-background/95 py-3 backdrop-blur">
           {flags.length > 0 && canDecide && (
-            <label className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+            <label className="flex items-start gap-2 text-sm text-destructive">
               <input type="checkbox" className="mt-1" checked={ack} onChange={(e) => setAck(e.target.checked)} />
               <span><ShieldAlert className="mr-1 inline h-4 w-4" />I acknowledge {flags.length} policy flag(s): {flags.map((f) => f.message).join("; ")}</span>
             </label>
@@ -170,7 +170,7 @@ export function ApprovalDetail({ id, onDecide, deciding, canDecide, position, on
           {canDecide ? (
             <>
               <Textarea id="decision-comment" rows={2} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Comment — optional to approve, required to request changes or reject" aria-label="Decision comment" />
-              {decideError && <p className="text-sm text-red-600">{decideError}</p>}
+              {decideError && <p className="text-sm text-destructive">{decideError}</p>}
               <div className="flex flex-wrap items-center gap-2">
                 <Button onClick={() => onDecide(a, "approve", comment, ack ? flags.map((f) => f.code ?? f.message) : [])} disabled={deciding || (flags.length > 0 && !ack) || valErrors.length > 0} title={valErrors.length ? "Validation errors must be fixed first" : undefined}>Approve <kbd className="ml-1 hidden rounded border border-primary-foreground/40 px-1 text-[10px] sm:inline">⌘↵</kbd></Button>
                 <Button variant="outline" onClick={() => onDecide(a, "request_changes", comment, [])} disabled={deciding || !comment.trim()}>Request changes</Button>

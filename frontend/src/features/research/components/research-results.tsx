@@ -5,8 +5,8 @@ import { Bookmark, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StatusChip } from "@/components/data/status-chip";
-import { ListSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { ListSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { domainOf, fmtDate, fmtUsd } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { RunProgress } from "@/features/ai/components/run-progress";
@@ -56,7 +56,7 @@ export function ResearchResults({ runId }: { runId: string }) {
       {active && !run.ai_run_id && <p className="text-sm text-muted-foreground">Searching → fetching → deduping → ranking → summarizing…</p>}
       {run.status === "failed" && <QueryError error={new Error(run.error || "The research run failed.")} title="Research failed" />}
       {(run.result?.partial_failures?.length ?? 0) > 0 && (
-        <p className="rounded-md bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">Partial failures: {run.result?.partial_failures?.join(" · ")}</p>
+        <p className="rounded-md bg-warning/[0.08] p-2 text-xs text-warning">Partial failures: {run.result?.partial_failures?.join(" · ")}</p>
       )}
 
       {(run.result?.summary || (run.result?.findings?.length ?? 0) > 0) && (

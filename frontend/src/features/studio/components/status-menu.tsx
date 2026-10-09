@@ -2,7 +2,7 @@
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { StatusChip } from "@/components/data/status-chip";
+import { StatusChip } from "@/components/shared/status-chip";
 import { usePermissions } from "@/features/common/hooks";
 import type { ContentStatus } from "@/features/common/types";
 

@@ -23,7 +23,7 @@ interface ResearchSource { id: string; title?: string | null; canonical_url: str
 function Cred({ v }: { v: number | null | undefined }) {
   if (v == null) return null;
   const n = Number(v) <= 1 ? Number(v) * 100 : Number(v);
-  return <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-medium", n >= 70 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200" : n >= 40 ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200")} title="Credibility">cred {Math.round(n)}</span>;
+  return <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-medium", n >= 70 ? "bg-success/12 text-success" : n >= 40 ? "bg-warning/12 text-warning" : "bg-destructive/10 text-destructive")} title="Credibility">cred {Math.round(n)}</span>;
 }
 
 /**
@@ -85,7 +85,7 @@ export function SourcesPanel({ content, pending, onAdd, onRemove }: { content: C
       )}
       {unsupported.length > 0 && (
         <div>
-          <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-300">Unsupported claims</p>
+          <p className="mb-1 text-xs font-medium text-destructive">Unsupported claims</p>
           <ul className="space-y-1 text-xs">{unsupported.map((c, i) => <li key={i} className="flex gap-1.5"><VerdictIcon verdict={c.verdict} />“{c.claim ?? c.text}”</li>)}</ul>
         </div>
       )}

@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { fromLocalInput } from "@/features/common/tz";
 import { errorMessage, fieldErrors } from "@/features/common/utils";
 import { contentApi } from "@/features/studio/api";
@@ -49,7 +49,7 @@ export function QuickCreateDialog({ open, onOpenChange, brandId, tz, defaultLoca
       <DialogContent>
         <DialogHeader><DialogTitle>Quick create</DialogTitle><DialogDescription>Creates the content (and blank platform versions). It appears on the calendar once an approved version is scheduled — nothing is scheduled automatically.</DialogDescription></DialogHeader>
         <div className="space-y-3">
-          <div className="space-y-1.5"><Label htmlFor="qc-title">Title</Label><Input id="qc-title" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} aria-invalid={!!errs.title} />{errs.title && <p className="text-xs text-red-600">{errs.title}</p>}</div>
+          <div className="space-y-1.5"><Label htmlFor="qc-title">Title</Label><Input id="qc-title" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} aria-invalid={!!errs.title} />{errs.title && <p className="text-xs text-destructive">{errs.title}</p>}</div>
           <div className="space-y-1.5"><Label htmlFor="qc-when">Planned for ({tz})</Label><Input id="qc-when" type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} /></div>
           <div className="space-y-1.5">
             <Label>Platforms</Label>
@@ -61,7 +61,7 @@ export function QuickCreateDialog({ open, onOpenChange, brandId, tz, defaultLoca
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={ai} onCheckedChange={(c) => setAi(c === true)} /><Sparkles className="h-4 w-4 text-ai" /> Draft with AI</label>
-          {create.error && !errs.title && <p className="text-sm text-red-600">{errorMessage(create.error)}</p>}
+          {create.error && !errs.title && <p className="text-sm text-destructive">{errorMessage(create.error)}</p>}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

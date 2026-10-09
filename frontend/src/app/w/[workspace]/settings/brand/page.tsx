@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ListSkeleton } from "@/components/data/async-states";
+import { ListSkeleton } from "@/components/shared/async-states";
 import { BrandSettingsView } from "@/features/brand/components/brand-settings-view";
 
 export default function BrandSettingsPage() {

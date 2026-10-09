@@ -14,7 +14,7 @@ function JsonField({ id, value, onChange, disabled }: { id: string; value: unkno
     <>
       <Textarea id={id} rows={4} className="font-mono text-xs" value={text} disabled={disabled} aria-invalid={!!err}
                 onChange={(e) => { setText(e.target.value); try { onChange(e.target.value.trim() ? JSON.parse(e.target.value) : undefined); setErr(null); } catch { setErr("Invalid JSON"); } }} />
-      {err && <p className="text-xs text-red-600">{err}</p>}
+      {err && <p className="text-xs text-destructive">{err}</p>}
     </>
   );
 }
@@ -30,7 +30,7 @@ export function ConfigForm({ nodeType, config, onChange, disabled, errors }: { n
       {props.map(([k, p]: [string, SchemaProp]) => {
         const id = `cfg-${k}`;
         const v = config[k] ?? p.default;
-        const title = <Label htmlFor={id} className="text-xs">{p.title ?? k}{required.has(k) && <span className="text-red-600"> *</span>}</Label>;
+        const title = <Label htmlFor={id} className="text-xs">{p.title ?? k}{required.has(k) && <span className="text-destructive"> *</span>}</Label>;
         const help = p.description && <p className="text-[11px] text-muted-foreground">{p.description}</p>;
         if (p.type === "boolean") return <div key={k} className="flex items-center justify-between gap-2">{title}<Switch id={id} checked={v === true} onCheckedChange={(c) => set(k, c)} disabled={disabled} /></div>;
         if (p.enum) return (
@@ -46,7 +46,7 @@ export function ConfigForm({ nodeType, config, onChange, disabled, errors }: { n
         if (p.format === "textarea") return <div key={k} className="space-y-1">{title}<Textarea id={id} rows={3} value={typeof v === "string" ? v : ""} onChange={(e) => set(k, e.target.value)} disabled={disabled} />{help}</div>;
         return <div key={k} className="space-y-1">{title}<Input id={id} className={p.format === "expression" || p.format === "cron" ? "h-8 font-mono text-xs" : "h-8"} value={typeof v === "string" || typeof v === "number" ? String(v) : ""} onChange={(e) => set(k, e.target.value)} disabled={disabled} placeholder={p.format === "expression" ? "trigger.field" : undefined} />{help}</div>;
       })}
-      {(errors ?? []).length > 0 && <ul className="space-y-0.5 text-xs text-red-600">{errors?.map((e, i) => <li key={i}>⚠ {e}</li>)}</ul>}
+      {(errors ?? []).length > 0 && <ul className="space-y-0.5 text-xs text-destructive">{errors?.map((e, i) => <li key={i}>⚠ {e}</li>)}</ul>}
     </div>
   );
 }

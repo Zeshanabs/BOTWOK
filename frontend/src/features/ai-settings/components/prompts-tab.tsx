@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ListSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/data/async-states";
-import { FormError } from "@/components/data/form-errors";
+import { ListSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/shared/async-states";
+import { FormError } from "@/components/shared/form-errors";
 import { fmtDateTime } from "@/lib/formatters";
 import { useActiveBrandId } from "@/features/brand/hooks";
 import { RunProgress } from "@/features/ai/components/run-progress";
@@ -71,7 +71,7 @@ function Editor({ agentId, template, readOnly }: { agentId: string; template: Pr
           <ul className="space-y-1">
             {versions.map((v) => (
               <li key={v.version} className="flex items-center justify-between gap-2 rounded-md border p-2 text-xs">
-                <span>v{v.version}{v.is_active || v.version === active ? <span className="ml-1 text-green-700 dark:text-green-300">active</span> : null}<span className="block text-muted-foreground">{fmtDateTime(v.created_at)}{typeof v.created_by === "object" && v.created_by?.full_name ? ` · ${v.created_by.full_name}` : ""}</span></span>
+                <span>v{v.version}{v.is_active || v.version === active ? <span className="ml-1 text-success">active</span> : null}<span className="block text-muted-foreground">{fmtDateTime(v.created_at)}{typeof v.created_by === "object" && v.created_by?.full_name ? ` · ${v.created_by.full_name}` : ""}</span></span>
                 <span className="flex gap-1">
                   <Button size="xs" variant="ghost" onClick={() => setBody(v.body)}>Load</Button>
                   {!readOnly && v.version !== active && <Button size="xs" variant="outline" disabled={save.isPending} onClick={() => save.mutate({ body: v.body, restore_version: v.version }, { onSuccess: () => toast.success(`Restored v${v.version}`) })}>Restore</Button>}

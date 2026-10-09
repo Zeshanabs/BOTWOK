@@ -57,19 +57,19 @@ export function RequestApprovalDialog({ open, onOpenChange, content, precheck, o
         <ul className="space-y-1.5 text-sm" aria-label="Pre-check">
           {precheck.rows.map((r, i) => (
             <li key={i} className="flex items-start gap-2">
-              {!r.ok ? <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" /> : r.warn ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /> : <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />}
+              {!r.ok ? <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" /> : r.warn ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" /> : <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />}
               <span>{r.label}</span>
             </li>
           ))}
         </ul>
-        {precheck.blocking && <p className="text-sm text-red-600">Fix the platform limit/validation errors before requesting approval.</p>}
-        <div className="space-y-1.5"><Label htmlFor="ra-note">Note for approvers</Label><Textarea id="ra-note" value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="Ready for Tuesday’s launch" />{errs.comment && <p className="text-xs text-red-600">{errs.comment}</p>}</div>
+        {precheck.blocking && <p className="text-sm text-destructive">Fix the platform limit/validation errors before requesting approval.</p>}
+        <div className="space-y-1.5"><Label htmlFor="ra-note">Note for approvers</Label><Textarea id="ra-note" value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="Ready for Tuesday’s launch" />{errs.comment && <p className="text-xs text-destructive">{errs.comment}</p>}</div>
         <div className="space-y-1.5"><Label>Request expires after</Label>
           <Select value={expires} onValueChange={setExpires}><SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="24">24 hours</SelectItem><SelectItem value="72">3 days</SelectItem><SelectItem value="168">7 days</SelectItem><SelectItem value="336">14 days</SelectItem></SelectContent></Select>
-          {errs.expires_in_hours && <p className="text-xs text-red-600">{errs.expires_in_hours}</p>}</div>
-        {!!error && !Object.keys(errs).length && <p className="text-sm text-red-600">{errorMessage(error)}</p>}
-        {!!errs._ && <p className="text-sm text-red-600">{errs._}</p>}
+          {errs.expires_in_hours && <p className="text-xs text-destructive">{errs.expires_in_hours}</p>}</div>
+        {!!error && !Object.keys(errs).length && <p className="text-sm text-destructive">{errorMessage(error)}</p>}
+        {!!errs._ && <p className="text-sm text-destructive">{errs._}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button disabled={precheck.blocking || pending} onClick={() => onSubmit({ comment: note.trim() || undefined, expires_in_hours: Number(expires) })}>

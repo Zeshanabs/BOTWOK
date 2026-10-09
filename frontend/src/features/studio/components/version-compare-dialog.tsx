@@ -28,8 +28,8 @@ function Parts({ parts, side }: { parts: DiffPart[]; side: "left" | "right" | "i
     <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
       {parts.map((p, i) => {
         if (p.kind === "same") return <span key={i}>{p.text}</span>;
-        if (p.kind === "del" && side !== "right") return <del key={i} className="rounded bg-red-100 text-red-900 decoration-red-500 dark:bg-red-900/40 dark:text-red-100">{p.text}</del>;
-        if (p.kind === "add" && side !== "left") return <ins key={i} className="rounded bg-emerald-100 text-emerald-900 no-underline dark:bg-emerald-900/40 dark:text-emerald-100">{p.text}</ins>;
+        if (p.kind === "del" && side !== "right") return <del key={i} className="rounded bg-destructive/10 text-destructive decoration-red-500">{p.text}</del>;
+        if (p.kind === "add" && side !== "left") return <ins key={i} className="rounded bg-success/12 text-success no-underline">{p.text}</ins>;
         return null;
       })}
     </p>
@@ -81,7 +81,7 @@ export function VersionCompareDialog({ open, onOpenChange, versions, variants, i
                 </div>
               )}
             </div>
-            {va && vb && va.target_id !== vb.target_id && <p className="text-xs text-amber-700 dark:text-amber-300">These versions belong to different targets ({versionTargetLabel(va, variants)} vs {versionTargetLabel(vb, variants)}).</p>}
+            {va && vb && va.target_id !== vb.target_id && <p className="text-xs text-warning">These versions belong to different targets ({versionTargetLabel(va, variants)} vs {versionTargetLabel(vb, variants)}).</p>}
             {effectiveMode === "side" ? (
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border p-3">{header(va)}<Parts parts={parts} side="left" />{canRestore && va && <Button className="mt-3" size="sm" variant="outline" onClick={() => onRestore(va)}>Restore v{va.version}</Button>}</div>

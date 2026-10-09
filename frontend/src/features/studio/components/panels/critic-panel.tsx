@@ -44,19 +44,19 @@ function ScoreRow({ name, value, strong, invert }: { name: string; value: number
     <div>
       <div className="flex justify-between text-xs"><span className={cn(strong && "font-medium")}>{name}</span><span className="tabular-nums">{Math.round(value)}</span></div>
       <div className="mt-0.5 h-1.5 overflow-hidden rounded-full bg-muted" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value)} aria-label={name}>
-        <div className={cn("h-full rounded-full", good ? "bg-emerald-500" : mid ? "bg-amber-500" : "bg-red-500")} style={{ width: `${value}%` }} />
+        <div className={cn("h-full rounded-full", good ? "bg-success" : mid ? "bg-warning" : "bg-destructive")} style={{ width: `${value}%` }} />
       </div>
     </div>
   );
 }
 
-const SEV: Record<string, string> = { blocker: "text-red-600", high: "text-red-600", error: "text-red-600", medium: "text-amber-600", warning: "text-amber-600", low: "text-muted-foreground", info: "text-muted-foreground" };
+const SEV: Record<string, string> = { blocker: "text-destructive", high: "text-destructive", error: "text-destructive", medium: "text-warning", warning: "text-warning", low: "text-muted-foreground", info: "text-muted-foreground" };
 
 export function VerdictIcon({ verdict }: { verdict: string }) {
-  if (verdict === "supported") return <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" aria-label="supported" />;
+  if (verdict === "supported") return <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-label="supported" />;
   if (verdict === "opinion") return <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" aria-label="opinion" />;
-  if (verdict === "contradicted") return <XCircle className="h-4 w-4 shrink-0 text-red-600" aria-label="contradicted" />;
-  return <HelpCircle className="h-4 w-4 shrink-0 text-amber-600" aria-label="unverifiable" />;
+  if (verdict === "contradicted") return <XCircle className="h-4 w-4 shrink-0 text-destructive" aria-label="contradicted" />;
+  return <HelpCircle className="h-4 w-4 shrink-0 text-warning" aria-label="unverifiable" />;
 }
 
 /** Per-claim fact-check verdicts with evidence and sources. */
@@ -65,14 +65,14 @@ export function ClaimVerdicts({ claims }: { claims: ClaimVerdict[] }) {
   return (
     <ul className="space-y-2">
       {claims.map((c, i) => (
-        <li key={i} className={cn("rounded-md border p-2 text-xs", c.verdict === "contradicted" && "border-red-300 dark:border-red-800", !["supported", "contradicted", "opinion"].includes(c.verdict) && "border-amber-300 dark:border-amber-800")}>
+        <li key={i} className={cn("rounded-md border p-2 text-xs", c.verdict === "contradicted" && "border-destructive/40", !["supported", "contradicted", "opinion"].includes(c.verdict) && "border-warning/40")}>
           <div className="flex items-start gap-2"><VerdictIcon verdict={c.verdict} /><p className="font-medium">“{c.claim ?? c.text}”</p></div>
           <p className="mt-1 pl-6 capitalize text-muted-foreground">{c.verdict}{c.confidence != null ? ` · confidence ${Math.round(normalizeScore(c.confidence) ?? 0)}%` : ""}</p>
           {typeof c.evidence === "string" && c.evidence && <p className="mt-1 pl-6">{c.evidence}</p>}
           {Array.isArray(c.evidence) && c.evidence.length > 0 && (
             <ul className="mt-1 space-y-0.5 pl-6">{c.evidence.map((ev, j) => <li key={j} className="italic text-muted-foreground">{ev.quote ? `“${ev.quote}”` : "source"}{ev.source_id && <span className="ml-1 font-mono not-italic">[{ev.source_id.slice(0, 8)}]</span>}</li>)}</ul>
           )}
-          {c.regulated_domain && <p className="mt-1 pl-6 text-amber-700 dark:text-amber-300">Regulated domain: {c.regulated_domain}</p>}
+          {c.regulated_domain && <p className="mt-1 pl-6 text-warning">Regulated domain: {c.regulated_domain}</p>}
           {(c.sources ?? []).length > 0 && (
             <ul className="mt-1 space-y-0.5 pl-6">
               {(c.sources ?? []).map((s, j) => <li key={s.id ?? j}>{s.url ? <a className="text-primary hover:underline" href={s.url} target="_blank" rel="noreferrer">{s.title ?? s.domain ?? s.url}</a> : s.title}</li>)}
@@ -122,10 +122,10 @@ export function CriticPanel({ content, variant, onApplySuggestion }: { content: 
             <p className="text-[11px] text-muted-foreground">
               {critique.agent ?? "critic"}{critique.model ? ` · ${critique.model}` : ""}{critique.same_model ? " · same-model critique (reduced independence)" : " · different model than the writer"}
             </p>
-            {critique.recommend && <p className="text-xs">Critic recommends: <span className={cn("font-medium", critique.recommend === "approve" ? "text-emerald-700 dark:text-emerald-300" : critique.recommend === "reject" ? "text-red-700 dark:text-red-300" : "text-amber-700 dark:text-amber-300")}>{critique.recommend}</span>{critique.risk_level ? ` · risk ${critique.risk_level}` : ""}</p>}
+            {critique.recommend && <p className="text-xs">Critic recommends: <span className={cn("font-medium", critique.recommend === "approve" ? "text-success" : critique.recommend === "reject" ? "text-destructive" : "text-warning")}>{critique.recommend}</span>{critique.risk_level ? ` · risk ${critique.risk_level}` : ""}</p>}
             {flags.length > 0 && (
-              <div className="rounded-md border border-red-300 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
-                <p className="flex items-center gap-1 font-medium text-red-700 dark:text-red-200"><ShieldAlert className="h-3.5 w-3.5" /> Policy flags — approvers must acknowledge</p>
+              <div className="rounded-md border border-destructive/40 bg-destructive/[0.06] p-2 text-xs">
+                <p className="flex items-center gap-1 font-medium text-destructive"><ShieldAlert className="h-3.5 w-3.5" /> Policy flags — approvers must acknowledge</p>
                 <ul className="mt-1 list-disc pl-4">{flags.map((f, i) => <li key={i}>{f.message}{f.code && f.code !== f.message && <span className="ml-1 font-mono text-muted-foreground">{f.code}</span>}</li>)}</ul>
               </div>
             )}

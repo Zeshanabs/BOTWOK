@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from "@/components/data/page-header";
+import { PageHeader } from "@/components/shared/page-header";
 import { useActiveBrandId, useBrands, usePillars } from "@/features/brand/hooks";
 import { useCan } from "@/lib/permissions";
 import { ResearchForm } from "./research-form";

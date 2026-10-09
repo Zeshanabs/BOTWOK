@@ -7,15 +7,15 @@ export function TaskGlyph({ status, className }: { status: string; className?: s
   switch (status) {
     case "succeeded":
     case "completed":
-      return <Check className={cn(base, "text-green-600 dark:text-green-400")} aria-label="Succeeded" />;
+      return <Check className={cn(base, "text-success")} aria-label="Succeeded" />;
     case "running":
     case "planning":
-      return <Loader2 className={cn(base, "animate-spin text-blue-600 motion-reduce:animate-none dark:text-blue-400")} aria-label="Running" />;
+      return <Loader2 className={cn(base, "animate-spin text-info motion-reduce:animate-none")} aria-label="Running" />;
     case "failed":
-      return <X className={cn(base, "text-red-600 dark:text-red-400")} aria-label="Failed" />;
+      return <X className={cn(base, "text-destructive")} aria-label="Failed" />;
     case "awaiting_approval":
     case "paused":
-      return <PauseCircle className={cn(base, "text-amber-600 dark:text-amber-400")} aria-label="Awaiting approval" />;
+      return <PauseCircle className={cn(base, "text-warning")} aria-label="Awaiting approval" />;
     case "skipped":
     case "cancelled":
       return <Ban className={cn(base, "text-zinc-500")} aria-label={status === "skipped" ? "Skipped" : "Cancelled"} />;

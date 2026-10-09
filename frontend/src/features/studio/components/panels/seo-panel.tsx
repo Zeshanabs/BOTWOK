@@ -66,7 +66,7 @@ export function SeoPanel({ content, variant, text, hashtags, onChange }: {
         <HashtagInput value={hashtags} onChange={onChange} banned={brandTags.banned} cap={rule?.hashtagCap} recommended={rule?.hashtagRecommended} disabled={!canCreate} />
       </div>
       {(tagIssues.length > 0 || hashtags.some((t) => banned.includes(t.toLowerCase()))) && (
-        <ul className="space-y-1 rounded-md border border-red-300 bg-red-50 p-2 text-xs text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+        <ul className="space-y-1 rounded-md border border-destructive/40 bg-destructive/[0.06] p-2 text-xs text-destructive">
           {hashtags.filter((t) => banned.includes(t.toLowerCase())).map((t) => <li key={t}>{t} is on the brand’s banned list</li>)}
           {tagIssues.map((i, k) => <li key={k}>{i.message}</li>)}
         </ul>

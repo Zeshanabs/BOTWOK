@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EmptyState } from "@/components/data/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError } from "@/features/common/components/query-state";
 import { useActiveBrand, useCampaigns, useMediaQuery, usePermissions, usePillars, useWorkspacePath } from "@/features/common/hooks";
@@ -223,7 +223,7 @@ export function CalendarPage() {
       </div>
 
       {warnings.length > 0 && (
-        <Alert className="mb-4 border-amber-300 dark:border-amber-800"><AlertTriangle className="text-amber-600" /><AlertTitle>Platform limits</AlertTitle>
+        <Alert className="mb-4 border-warning/40"><AlertTriangle className="text-warning" /><AlertTitle>Platform limits</AlertTitle>
           <AlertDescription><ul className="space-y-0.5">{warnings.map((w, i) => <li key={i}>{w.date && <span className="font-medium">{keyLabel(w.date.slice(0, 10), { weekday: "short", day: "numeric" })} · </span>}{w.account && `${w.account}: `}{w.message}{w.source && <span className="text-muted-foreground"> (source: {w.source})</span>}</li>)}</ul></AlertDescription>
         </Alert>
       )}

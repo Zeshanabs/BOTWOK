@@ -2,8 +2,8 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Plus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { dayKey, keyLabel, parseDayKey, timeLabel, tzParts } from "@/features/common/tz";
 import { cn } from "@/lib/utils";
 import { BOARD_COLUMNS, cardTime, type CalendarCard as Card } from "../api";

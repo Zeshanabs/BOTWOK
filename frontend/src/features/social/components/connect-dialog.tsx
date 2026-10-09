@@ -3,9 +3,9 @@ import { useState } from "react";
 import { CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { FormError } from "@/components/data/form-errors";
-import { NotAvailable, isNotAvailable } from "@/components/data/async-states";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { FormError } from "@/components/shared/form-errors";
+import { NotAvailable, isNotAvailable } from "@/components/shared/async-states";
 import { platformMeta } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { useSocialMutations } from "../hooks";
@@ -54,7 +54,7 @@ export function ConnectDialog({ platform, brandId, reconnectAccountId, onOpenCha
                 ))}
               </fieldset>
             )}
-            {req.notes?.map((n) => <p key={n} className="flex gap-2 rounded-md bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />{n}</p>)}
+            {req.notes?.map((n) => <p key={n} className="flex gap-2 rounded-md bg-warning/[0.08] p-2 text-xs text-warning"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />{n}</p>)}
             <p className="text-xs text-muted-foreground">You&apos;ll be sent to {meta.label} to approve access. Botwok stores tokens encrypted and never shows them.</p>
           </div>
         )}

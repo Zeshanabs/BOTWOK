@@ -11,11 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from "@/components/data/page-header";
-import { StatusChip } from "@/components/data/status-chip";
-import { EmptyState } from "@/components/data/empty-state";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { ListSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusChip } from "@/components/shared/status-chip";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ListSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { fmtDate, fmtRelative } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useSession } from "@/stores/session";
@@ -82,7 +82,7 @@ function InviteDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
           <ul className="space-y-2 text-sm">
             {results.map((r) => (
               <li key={r.email} className="rounded-md border p-2">
-                <p className="flex items-center gap-1">{r.ok ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-red-600" />}{r.email}</p>
+                <p className="flex items-center gap-1">{r.ok ? <Check className="h-4 w-4 text-success" /> : <X className="h-4 w-4 text-destructive" />}{r.email}</p>
                 {r.message && <p className="text-xs text-destructive">{r.message}</p>}
                 {r.link && (
                   <div className="mt-1 flex items-center gap-1">
@@ -212,7 +212,7 @@ export function TeamView() {
                 {MATRIX.map((row) => (
                   <TableRow key={row.cap}>
                     <TableCell className="text-sm">{row.cap}</TableCell>
-                    {ROLES.map((r) => <TableCell key={r} className="text-center">{row.roles.includes(r) ? <Check className="mx-auto h-4 w-4 text-green-600" aria-label="Allowed" /> : <span className="sr-only">Not allowed</span>}</TableCell>)}
+                    {ROLES.map((r) => <TableCell key={r} className="text-center">{row.roles.includes(r) ? <Check className="mx-auto h-4 w-4 text-success" aria-label="Allowed" /> : <span className="sr-only">Not allowed</span>}</TableCell>)}
                   </TableRow>
                 ))}
               </TableBody>

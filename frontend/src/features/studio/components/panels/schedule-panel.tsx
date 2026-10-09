@@ -1,6 +1,6 @@
 "use client";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { Button } from "@/components/ui/button";
 import { useActiveBrand } from "@/features/common/hooks";
 import { platformMeta } from "@/lib/platforms";

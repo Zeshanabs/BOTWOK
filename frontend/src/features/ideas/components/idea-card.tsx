@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, MoreHorizontal, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { humanize, score100 } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useSession } from "@/stores/session";
@@ -71,9 +71,9 @@ export function IdeaCard({ idea, pillarName, actions, dragHandle }: { idea: Idea
       </div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         {(pillarName || idea.pillar?.name) && <span>{pillarName || idea.pillar?.name}</span>}
-        {s !== null && <span className="inline-flex items-center gap-0.5 tabular-nums"><Star className="h-3 w-3 fill-current text-amber-500" />{s}</span>}
+        {s !== null && <span className="inline-flex items-center gap-0.5 tabular-nums"><Star className="h-3 w-3 fill-current text-warning" />{s}</span>}
         {ev && (ev.href.startsWith("http") ? <a href={ev.href} target="_blank" rel="noreferrer noopener" className="text-primary hover:underline">↳ {ev.label}</a> : <Link href={ev.href} className="text-primary hover:underline">↳ {ev.label}</Link>)}
-        {idea.similar_to && <span className="text-amber-700 dark:text-amber-300">similar to another idea</span>}
+        {idea.similar_to && <span className="text-warning">similar to another idea</span>}
       </div>
       {idea.status === "promoted" && idea.promoted_content_id ? (
         <Link href={`/w/${slug}/studio/${idea.promoted_content_id}`} className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline">In Studio <ArrowUpRight className="h-3 w-3" /></Link>

@@ -22,12 +22,12 @@ export const NODE_ICONS: Record<string, LucideIcon> = {
   schedule: CalendarClock, publish: Send, wait: Hourglass, webhook: Webhook, notification: Bell, analytics: BarChart3, action: Cog,
 };
 const SE_STYLE: Record<string, string> = {
-  EXTERNAL_WRITE: "border-red-300 text-red-700 dark:border-red-800 dark:text-red-300",
-  SPEND: "border-violet-300 text-violet-700 dark:border-violet-800 dark:text-violet-300",
-  APPROVAL: "border-amber-300 text-amber-700 dark:border-amber-800 dark:text-amber-300",
-  EXTERNAL_READ: "border-sky-300 text-sky-700 dark:border-sky-800 dark:text-sky-300",
+  EXTERNAL_WRITE: "border-destructive/40 text-destructive  ",
+  SPEND: "border-ai/40 text-ai  ",
+  APPROVAL: "border-warning/40 text-warning  ",
+  EXTERNAL_READ: "border-info/40 text-info  ",
 };
-const RUN_RING: Record<string, string> = { succeeded: "ring-2 ring-emerald-500", failed: "ring-2 ring-red-500", running: "ring-2 ring-blue-500", awaiting_approval: "ring-2 ring-amber-500", waiting: "ring-2 ring-amber-500" };
+const RUN_RING: Record<string, string> = { succeeded: "ring-2 ring-emerald-500", failed: "ring-2 ring-destructive/40", running: "ring-2 ring-blue-500", awaiting_approval: "ring-2 ring-amber-500", waiting: "ring-2 ring-amber-500" };
 
 /** Canvas node: icon, label, type, side-effect class, branch handles, validation outline and run-status overlay. */
 export function WorkflowNodeView({ data, selected }: NodeProps<WFNode>) {
@@ -35,13 +35,13 @@ export function WorkflowNodeView({ data, selected }: NodeProps<WFNode>) {
   const isTrigger = data.type === "trigger" || data.type.startsWith("trigger.");
   const branches = data.branches ?? [];
   return (
-    <div className={cn("w-60 rounded-lg border bg-card px-3 py-2 text-xs text-card-foreground shadow-sm", selected && "ring-2 ring-primary", data.invalid && "border-red-500 border-2", data.runStatus && RUN_RING[data.runStatus])}>
+    <div className={cn("w-60 rounded-lg border bg-card px-3 py-2 text-xs text-card-foreground shadow-sm", selected && "ring-2 ring-primary", data.invalid && "border-destructive/40 border-2", data.runStatus && RUN_RING[data.runStatus])}>
       {!isTrigger && <Handle type="target" position={Position.Top} className="!h-2.5 !w-2.5 !bg-muted-foreground" />}
       <div className="flex items-center gap-2">
         <Icon className={cn("h-4 w-4 shrink-0", data.type === "ai_agent" || data.type === "generate" ? "text-ai" : "text-muted-foreground")} aria-hidden />
         <span className="min-w-0 flex-1 truncate font-medium">{data.label || data.typeLabel}</span>
         {data.runStatus && <TaskGlyph status={data.runStatus} />}
-        {data.invalid && <span className="text-red-600" aria-label="invalid">⚠</span>}
+        {data.invalid && <span className="text-destructive" aria-label="invalid">⚠</span>}
       </div>
       <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
         <span>{data.typeLabel}</span>

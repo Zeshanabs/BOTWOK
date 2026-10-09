@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Globe, Newspaper } from "lucide-react";
-import { EmptyState } from "@/components/data/empty-state";
-import { ListSkeleton, QueryError } from "@/components/data/async-states";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ListSkeleton, QueryError } from "@/components/shared/async-states";
 import { domainOf, fmtDate } from "@/lib/formatters";
 import { useResearchSources } from "@/features/research/hooks";
 import { credibilityOf } from "@/features/research/types";

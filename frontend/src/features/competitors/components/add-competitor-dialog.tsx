@@ -6,9 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { AvailabilityBadge } from "@/components/data/availability-badge";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { AvailabilityBadge } from "@/components/shared/availability-badge";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
 import { PLATFORMS } from "@/lib/platforms";
 import { useSocialAccounts } from "@/features/social/hooks";
 import { capabilityState, type SocialAccount } from "@/features/social/types";

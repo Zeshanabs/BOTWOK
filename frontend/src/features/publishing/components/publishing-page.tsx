@@ -11,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EmptyState } from "@/components/data/empty-state";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError } from "@/features/common/components/query-state";
 import { useActiveBrand, usePermissions, useWorkspacePath } from "@/features/common/hooks";
@@ -94,13 +94,13 @@ export function PublishingPage() {
           {p.status === "paused" && <DropdownMenuItem onClick={() => action.mutate({ kind: "resume", post: p })}><Play /> Resume</DropdownMenuItem>}
           {cid && <DropdownMenuItem asChild><Link href={ws(`studio/${cid}${postPlatform(p) ? `?variant=${postPlatform(p)}&panel=schedule` : ""}`)}><Pencil /> Edit in Studio</Link></DropdownMenuItem>}
           <DropdownMenuItem onClick={() => setAttemptsFor(p)}><History /> View attempts</DropdownMenuItem>
-          {["scheduled", "queued", "paused", "failed"].includes(p.status) && <><DropdownMenuSeparator /><DropdownMenuItem className="text-red-600" onClick={() => setCancelling(p)}><Ban /> Cancel</DropdownMenuItem></>}
+          {["scheduled", "queued", "paused", "failed"].includes(p.status) && <><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => setCancelling(p)}><Ban /> Cancel</DropdownMenuItem></>}
         </DropdownMenuContent>
       </DropdownMenu>
     );
   };
   const nextRetry = (p: ScheduledPost) => (p.next_attempt_at ? relTime(p.next_attempt_at) : "—");
-  const errorCell = (p: ScheduledPost) => p.last_error ? <span className="line-clamp-2 text-xs text-red-700 dark:text-red-300" title={p.last_error}>{p.last_error_category && <span className="mr-1 font-mono">{p.last_error_category}</span>}{p.last_error}</span> : <span className="text-muted-foreground">—</span>;
+  const errorCell = (p: ScheduledPost) => p.last_error ? <span className="line-clamp-2 text-xs text-destructive" title={p.last_error}>{p.last_error_category && <span className="mr-1 font-mono">{p.last_error_category}</span>}{p.last_error}</span> : <span className="text-muted-foreground">—</span>;
 
   return (
     <div className="space-y-6">
@@ -154,7 +154,7 @@ export function PublishingPage() {
                         <div className="min-w-0 flex-1">
                           <p className="flex items-center gap-1.5 font-medium">{postPlatform(p) && <PlatformIcon platform={postPlatform(p) as string} size={16} />}<span className="truncate">{postTitle(p)}</span></p>
                           <p className="text-xs text-muted-foreground">{p.social_account?.display_name} · {fmtDateTime(p.scheduled_at, timezone)} · {p.attempt_count ?? 0}/{p.max_attempts ?? 5}</p>
-                          {p.last_error && <p className="mt-1 text-xs text-red-700 dark:text-red-300">{p.last_error}</p>}
+                          {p.last_error && <p className="mt-1 text-xs text-destructive">{p.last_error}</p>}
                         </div>
                         {rowActions(p)}
                       </li>))}</ul>
@@ -166,7 +166,7 @@ export function PublishingPage() {
       </section>
 
       {dead.length > 0 && (
-        <section aria-labelledby="dead-h" className="space-y-2 rounded-lg border border-red-300 p-4 dark:border-red-900">
+        <section aria-labelledby="dead-h" className="space-y-2 rounded-lg border border-destructive/40 p-4">
           <h2 id="dead-h" className="text-lg font-semibold">Dead letter ({dead.length}) <span className="text-sm font-normal text-muted-foreground">retries exhausted — needs a human</span></h2>
           <ul className="space-y-2">
             {dead.map((p) => {
@@ -178,14 +178,14 @@ export function PublishingPage() {
                     {postPlatform(p) && <PlatformIcon platform={postPlatform(p) as string} size={16} />}<span className="font-medium">{postTitle(p)}</span>
                     <span className="text-muted-foreground">{p.social_account?.display_name} · {fmtDateTime(p.scheduled_at, timezone)} · {p.attempt_count ?? 0}/{p.max_attempts ?? 5}</span>
                   </div>
-                  <p className="mt-1 font-mono text-xs text-red-700 dark:text-red-300">{p.last_error_category ? `${p.last_error_category}: ` : ""}{p.last_error ?? "Unknown error"}</p>
+                  <p className="mt-1 font-mono text-xs text-destructive">{p.last_error_category ? `${p.last_error_category}: ` : ""}{p.last_error ?? "Unknown error"}</p>
                   {canSchedule && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {authErr && <Button size="xs" asChild><Link href={ws("settings/social-accounts")}>Reconnect account</Link></Button>}
                       <Button size="xs" variant="outline" disabled={action.isPending} onClick={() => action.mutate({ kind: "retry", post: p })}><RotateCw /> Retry</Button>
                       {cid && <Button size="xs" variant="outline" asChild><Link href={ws(`studio/${cid}`)}><Pencil /> Edit</Link></Button>}
                       <Button size="xs" variant="ghost" onClick={() => setAttemptsFor(p)}><History /> Attempts</Button>
-                      <Button size="xs" variant="ghost" className="text-red-600" onClick={() => setCancelling(p)}><Ban /> Cancel</Button>
+                      <Button size="xs" variant="ghost" className="text-destructive" onClick={() => setCancelling(p)}><Ban /> Cancel</Button>
                     </div>
                   )}
                 </li>
@@ -253,9 +253,9 @@ function AttemptRow({ a, tz }: { a: PublishAttempt; tz: string }) {
   return (
     <div className="rounded-md border p-3 text-sm">
       <div className="flex items-center gap-2"><span className="font-medium">#{a.attempt_no}</span><StatusChip status={a.status} /><span className="ml-auto text-xs text-muted-foreground">{fmtDateTime(a.started_at, tz)}{a.finished_at ? ` → ${fmtDateTime(a.finished_at, tz, { month: undefined, day: undefined })}` : ""}</span></div>
-      {(a.error_category || a.error_code || a.error_message) && <p className="mt-1 font-mono text-xs text-red-700 dark:text-red-300">{[a.error_category, a.error_code].filter(Boolean).join(" · ")}{a.error_message ? ` — ${a.error_message}` : ""}</p>}
+      {(a.error_category || a.error_code || a.error_message) && <p className="mt-1 font-mono text-xs text-destructive">{[a.error_category, a.error_code].filter(Boolean).join(" · ")}{a.error_message ? ` — ${a.error_message}` : ""}</p>}
       {a.segments_done ? <p className="mt-1 text-xs text-muted-foreground">{a.segments_done} segment(s) already published — a retry resumes, it doesn&apos;t restart.</p> : null}
-      {a.status === "ambiguous" && <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">Ambiguous result — reconciled before any retry; never retried blindly.</p>}
+      {a.status === "ambiguous" && <p className="mt-1 text-xs text-warning">Ambiguous result — reconciled before any retry; never retried blindly.</p>}
       <button type="button" className="mt-1 text-xs text-muted-foreground hover:text-foreground" onClick={() => setOpen((o) => !o)} aria-expanded={open}>{open ? "Hide" : "Show"} raw platform response</button>
       {open && <AttemptDetail id={a.id} />}
     </div>
@@ -269,7 +269,7 @@ function AttemptsSheet({ post, title, onOpenChange, tz }: { post: ScheduledPost 
       <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader><SheetTitle>Publish attempts</SheetTitle><SheetDescription>{title}{post ? ` · ${post.attempt_count ?? 0}/${post.max_attempts ?? 5} attempts` : ""}</SheetDescription></SheetHeader>
         <div className="space-y-3 px-4 pb-6">
-          {post?.last_error && <p className="rounded-md bg-red-50 p-2 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-200">Last error: {post.last_error}</p>}
+          {post?.last_error && <p className="rounded-md bg-destructive/[0.06] p-2 text-xs text-destructive">Last error: {post.last_error}</p>}
           {attempts.length === 0 && <p className="text-sm text-muted-foreground">No attempts yet.</p>}
           {attempts.map((a) => <AttemptRow key={a.id} a={a} tz={tz} />)}
         </div>
