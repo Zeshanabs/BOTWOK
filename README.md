@@ -18,6 +18,12 @@ make seed             # agent registry, prompt templates, demo workspace
 scripts/dev.sh        # api :8000, worker, scheduler, web :3000 (logs in .dev-logs/)
 ```
 
+The backend is installed into `backend/.venv` as an editable package, so once that venv is active (`source backend/.venv/bin/activate`) `uvicorn app.main:app`, `python -m app.seed`, `alembic -c backend/alembic.ini ...` and the `procrastinate` CLI work from any directory. Day to day, prefer the Make targets (`make api`, `make worker`, `make scheduler`, `make web`) or `scripts/dev.sh`, which run each process from the right directory.
+
+Everything in Docker instead (API, worker, scheduler and web built from `infrastructure/docker/`): `docker compose --profile full up --build`, then open http://localhost:3000. Stop with `docker compose --profile full down`.
+
+If the API, worker or scheduler exits right after starting, read its `preflight.failed` log line: it names the problem and the command that fixes it (Postgres not reachable → `make up`; schema missing/out of date or job-queue schema missing → `make migrate`). The job-queue schema is part of the Alembic migrations, so `make migrate` is all that is needed after pulling.
+
 Open http://localhost:3000 and sign in with the seeded demo account (`demo@botwok.local` / `botwok-demo`), or create your own account (the first user owns the workspace). API docs: http://localhost:8000/api/docs. Mailpit (local email): http://localhost:8025.
 
 ## Configure AI and search providers

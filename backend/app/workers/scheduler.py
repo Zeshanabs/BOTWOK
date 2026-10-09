@@ -81,7 +81,9 @@ async def _tick() -> None:
 
 
 async def scheduler_loop() -> None:
+    from app.core.preflight import check_database
     from app.workers.app import procrastinate_app
+    await check_database(process="scheduler")
     try:
         from app.events import load_consumers
         load_consumers()

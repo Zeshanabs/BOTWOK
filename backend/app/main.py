@@ -25,7 +25,9 @@ ROUTER_MODULES = ["auth", "workspaces", "brands", "social", "research", "competi
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("startup", env=settings.app_env)
+    from app.core.preflight import check_database
     from app.workers.app import procrastinate_app
+    await check_database(process="api")           # clear error + fast exit when Postgres/schema/queue are missing
     await procrastinate_app.open_async()
     try:
         from app.events import load_consumers

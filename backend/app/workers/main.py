@@ -12,7 +12,9 @@ log = get_logger("workers")
 
 
 async def run_worker() -> None:
+    from app.core.preflight import check_database
     from app.workers.app import QUEUES, procrastinate_app
+    await check_database(process="worker")
     try:
         from app.events import load_consumers
         load_consumers()
