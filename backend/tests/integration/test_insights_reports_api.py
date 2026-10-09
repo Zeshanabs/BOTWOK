@@ -30,8 +30,10 @@ async def env(client, seeded_user, monkeypatch):
     from app.models.scheduling import PostMetric, PublishedPost
     from app.models.social import SocialAccount
 
-    for key in ("anthropic_api_key", "openai_api_key", "xai_api_key", "google_api_key"):
+    for key in ("anthropic_api_key", "openai_api_key", "xai_api_key", "google_api_key", "groq_api_key", "openrouter_api_key",
+                "huggingface_api_key"):
         monkeypatch.setattr(settings, key, "")          # force the no-AI (deterministic) path
+    monkeypatch.setattr(settings, "free_fallback_models", "")   # ... including the key-less free fallback
     register_embedding_provider(FakeEmbeddingProvider(settings.embedding_dims))
     h = dict(seeded_user["headers"])
     if not h.get("X-Workspace-Id"):          # the fixture reads `memberships`; signup returns `workspace` → ask /auth/me

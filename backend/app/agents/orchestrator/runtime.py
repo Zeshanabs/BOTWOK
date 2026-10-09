@@ -67,7 +67,10 @@ class AgentRuntime:
     # -- providers ----------------------------------------------------------------------------------------------------
     async def _candidates(self, db: Any, ctx: RunContext, agent: Agent) -> list[tuple[Any, str]]:
         routing = ctx.settings.get("routing")
-        cands = await providers_for_tier(db, ctx.workspace_id, agent.spec.tier, agent.spec.id, routing=routing)
+        try:
+            cands = await providers_for_tier(db, ctx.workspace_id, agent.spec.tier, agent.spec.id, routing=routing)
+        except ValueError as e:   # NoProviderConfigured: the message already says how to fix it
+            raise TaskFailed(str(e), kind="provider_error") from e
         if agent.spec.id == "critic" and (routing or {}).get("critic_distinct_family", True) and len(cands) > 1:
             writer_specs = candidate_specs(routing or {}, "powerful", "writer")
             writer_fam = model_family(writer_specs[0]) if writer_specs else None
@@ -86,7 +89,11 @@ class AgentRuntime:
                 last = e
                 log.warning("runtime.provider_failed", provider=getattr(provider, "name", "?"), model=model, error=str(e)[:200])
                 continue
-        raise TaskFailed(f"all providers failed: {last}", kind="provider_error")
+        tried = ", ".join(f"{getattr(p, 'name', '?')}/{m}" for p, m in candidates)
+        hint = ""
+        if any(getattr(p, "name", "") in ("pollinations", "ollama") for p, _ in candidates):
+            hint = " Add a provider key in Settings → AI → Provider keys to use your own account instead of the free fallback."
+        raise TaskFailed(f"all providers failed (tried {tried}): {last}.{hint}", kind="provider_error")
 
     async def _prompt(self, db: Any, ctx: RunContext, agent: Agent) -> tuple[str | None, int | None]:
         try:

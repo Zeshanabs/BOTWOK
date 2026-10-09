@@ -5,6 +5,11 @@
 - get_routing(db, workspace_id) -> routing table (settings defaults merged with ai_settings.routing)
 - provider_for_tier(db, workspace_id, tier, agent_id=None) -> (provider, model)   (first viable candidate)
 - providers_for_tier(...) -> [(provider, model), ...]                              (primary + fallbacks)
+
+Candidates whose provider has no API key (workspace secret or environment) are skipped instead of being handed to an
+SDK that would fail at request time. When nothing routed is usable, the first provider that *does* have a key is used
+with a sensible default model for the tier, then the key-less free fallbacks (FREE_FALLBACK_MODELS, local Ollama).
+Only when all of that is empty does `NoProviderConfigured` explain exactly how to configure AI.
 """
 from __future__ import annotations
 
@@ -18,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.core.logging import get_logger
 from app.core.ports.ai_provider import AIProvider
+from app.integrations.ai.base import KEYLESS_PROVIDERS, configuration_hint
 
 log = get_logger("ai.registry")
 
@@ -27,12 +33,34 @@ PROVIDER_BASE_URLS: dict[str, str | None] = {
     "xai": "https://api.x.ai/v1",
     "openrouter": "https://openrouter.ai/api/v1",
     "google": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "groq": "https://api.groq.com/openai/v1",
+    "huggingface": "https://router.huggingface.co/v1",
+    "pollinations": "https://text.pollinations.ai/openai",
     "ollama": settings.ollama_base_url,
 }
-KNOWN_PROVIDERS = ("anthropic", "openai", "xai", "google", "openrouter", "ollama", "fake")
+KNOWN_PROVIDERS = ("anthropic", "openai", "google", "xai", "groq", "openrouter", "huggingface", "pollinations", "ollama", "fake")
+#: Order in which a provider that has a key is auto-selected when the routed provider has none.
+AUTO_PROVIDER_ORDER = ("anthropic", "openai", "google", "groq", "xai", "openrouter", "huggingface")
+#: Default model per provider and tier (editable per workspace in Settings → AI → routing).
+DEFAULT_MODELS: dict[str, dict[str, str]] = {
+    "anthropic": {"cheap": "claude-haiku-4-5-20251001", "balanced": "claude-sonnet-5-5", "powerful": "claude-opus-5-5"},
+    "openai": {"cheap": "gpt-5-mini", "balanced": "gpt-5-mini", "powerful": "gpt-5"},
+    "google": {"cheap": "gemini-2.5-flash-lite", "balanced": "gemini-2.5-flash", "powerful": "gemini-2.5-pro"},
+    "groq": {"cheap": "llama-3.1-8b-instant", "balanced": "llama-3.3-70b-versatile", "powerful": "llama-3.3-70b-versatile"},
+    "xai": {"cheap": "grok-3-mini", "balanced": "grok-3-mini", "powerful": "grok-4"},
+    "openrouter": {"cheap": "openai/gpt-5-mini", "balanced": "openai/gpt-5-mini", "powerful": "anthropic/claude-sonnet-5-5"},
+    "huggingface": {"cheap": "meta-llama/Llama-3.1-8B-Instruct", "balanced": "Qwen/Qwen2.5-72B-Instruct",
+                    "powerful": "Qwen/Qwen2.5-72B-Instruct"},
+    "pollinations": {"cheap": "openai", "balanced": "openai", "powerful": "openai-large"},
+    "ollama": {"cheap": "llama3.1", "balanced": "llama3.1", "powerful": "llama3.1"},
+}
 
 _cache: dict[str, AIProvider] = {}
 _overrides: dict[str, AIProvider] = {}
+
+
+class NoProviderConfigured(ValueError):
+    """No routed, keyed or free provider is available; the message says how to fix it."""
 
 
 # ----------------------------------------------------------------------------- model specs
@@ -73,7 +101,18 @@ def model_spec(provider: str, model: str) -> str:
 
 def env_api_key(provider: str) -> str | None:
     return {"anthropic": settings.anthropic_api_key, "openai": settings.openai_api_key, "xai": settings.xai_api_key,
-            "google": settings.google_api_key, "ollama": "ollama"}.get(provider) or None
+            "google": settings.google_api_key, "groq": settings.groq_api_key, "openrouter": settings.openrouter_api_key,
+            "huggingface": settings.huggingface_api_key, "pollinations": settings.pollinations_api_key,
+            "ollama": "ollama"}.get(provider) or None
+
+
+def needs_key(provider: str) -> bool:
+    return provider not in KEYLESS_PROVIDERS
+
+
+def free_fallback_specs() -> list[str]:
+    """Model specs from FREE_FALLBACK_MODELS (comma-separated); empty disables the key-less fallback."""
+    return [s.strip() for s in (settings.free_fallback_models or "").split(",") if s.strip()]
 
 
 def register_provider(name: str, provider: AIProvider | None) -> None:
@@ -216,26 +255,76 @@ async def _key_for(db: AsyncSession | None, workspace_id: UUID | str | None, pro
     return env_api_key(provider)
 
 
+async def _usable(db: AsyncSession | None, workspace_id: UUID | str | None, provider_name: str) -> tuple[bool, str | None]:
+    """(usable, key): overrides and key-less providers are always usable; others need a workspace or env key."""
+    if provider_name in _overrides:
+        return True, None
+    key = await _key_for(db, workspace_id, provider_name)
+    if needs_key(provider_name) and not key:
+        return False, None
+    return True, key
+
+
 async def providers_for_tier(db: AsyncSession | None, workspace_id: UUID | str | None, tier: str,
                              agent_id: str | None = None, *, routing: dict[str, Any] | None = None
                              ) -> list[tuple[AIProvider, str]]:
     routing = routing or await get_routing(db, workspace_id)
     out: list[tuple[AIProvider, str]] = []
+    unconfigured: list[str] = []
     for spec in candidate_specs(routing, tier, agent_id):
         try:
             provider_name, model = resolve_model(spec)
-            key = await _key_for(db, workspace_id, provider_name)
+            usable, key = await _usable(db, workspace_id, provider_name)
+            if not usable:
+                unconfigured.append(spec)
+                continue
             out.append((get_provider(provider_name, key), model))
         except Exception as e:  # noqa: BLE001
             log.warning("routing.candidate_skipped", spec=spec, error=str(e)[:200])
-    if not out:
-        raise ValueError(f"no model configured for tier {tier!r}")
-    return out
+    if out:
+        return out
+
+    # Nothing routed is usable: prefer any provider the operator did give a key, then the free key-less fallbacks.
+    eff_tier = _lower_tier(tier) if routing.get("economy_mode") else tier
+    for name in AUTO_PROVIDER_ORDER:
+        model = DEFAULT_MODELS.get(name, {}).get(eff_tier)
+        usable, key = await _usable(db, workspace_id, name)
+        if model and usable and (key or name in _overrides):
+            out.append((get_provider(name, key), model))
+            break
+    for spec in free_fallback_specs():
+        try:
+            provider_name, model = resolve_model(spec)
+            usable, key = await _usable(db, workspace_id, provider_name)
+            if usable:
+                out.append((get_provider(provider_name, key), model))
+        except Exception as e:  # noqa: BLE001
+            log.warning("routing.free_fallback_skipped", spec=spec, error=str(e)[:200])
+    if out:
+        log.warning("routing.fallback_in_use", tier=tier, unconfigured=unconfigured,
+                    using=[f"{p.name}/{m}" for p, m in out])
+        return out
+    routed = ", ".join(unconfigured) or "nothing"
+    raise NoProviderConfigured(f"No AI provider is configured for the {tier!r} tier (routed to {routed}, no API key found). "
+                               f"{configuration_hint()}")
 
 
 async def provider_for_tier(db: AsyncSession | None, workspace_id: UUID | str | None, tier: str,
                             agent_id: str | None = None) -> tuple[AIProvider, str]:
     return (await providers_for_tier(db, workspace_id, tier, agent_id))[0]
+
+
+async def ai_available(db: AsyncSession | None, workspace_id: UUID | str | None, tier: str = "powerful",
+                       agent_id: str | None = None) -> bool:
+    """True when some provider (routed, keyed, or free fallback) can serve `tier`. No network calls."""
+    try:
+        await providers_for_tier(db, workspace_id, tier, agent_id)
+        return True
+    except NoProviderConfigured:
+        return False
+    except Exception as e:  # noqa: BLE001
+        log.info("ai_available.failed", error=str(e)[:200])
+        return False
 
 
 def model_family(spec_or_model: str) -> str:

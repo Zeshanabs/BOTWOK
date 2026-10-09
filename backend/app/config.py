@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     xai_api_key: str = ""
     google_api_key: str = ""
+    groq_api_key: str = ""
+    openrouter_api_key: str = ""
+    huggingface_api_key: str = ""
+    pollinations_api_key: str = ""
+    # Comma-separated model specs used when no routed provider has a key (key-less public endpoint). Empty disables.
+    free_fallback_models: str = "pollinations/openai"
     ollama_base_url: str = "http://localhost:11434/v1"
     default_cheap_model: str = "anthropic/claude-haiku-4-5-20251001"
     default_balanced_model: str = "anthropic/claude-sonnet-5-5"

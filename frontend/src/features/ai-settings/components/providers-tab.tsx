@@ -21,6 +21,7 @@ const NONE = "__none";
 
 function providerStatus(s: AiSettings["providers"], name: string): string {
   const p = s?.[name];
+  if (PROVIDERS.find((x) => x.name === name)?.keyless) return "active";
   if (!p) return "not_set";
   if (p.status) return p.status === "valid" ? "active" : p.status;
   return p.configured || p.last4 ? "active" : "not_set";
@@ -83,7 +84,7 @@ export function ProvidersTab({ settings, readOnly }: { settings: AiSettings; rea
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader><CardTitle className="text-sm">Provider keys</CardTitle><CardDescription>AI features stay off until a provider key or a local model is configured.</CardDescription></CardHeader>
+        <CardHeader><CardTitle className="text-sm">Provider keys</CardTitle><CardDescription>Runs use the routed provider when it has a key, otherwise any provider with a key, otherwise the free key-less fallback. Add a key to use your own account.</CardDescription></CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader><TableRow><TableHead>Provider</TableHead><TableHead>Status</TableHead><TableHead>Key</TableHead><TableHead>Verified</TableHead><TableHead /></TableRow></TableHeader>
@@ -93,12 +94,12 @@ export function ProvidersTab({ settings, readOnly }: { settings: AiSettings; rea
                 const info = settings.providers?.[p.name];
                 return (
                   <TableRow key={p.name}>
-                    <TableCell className="font-medium">{p.label}</TableCell>
+                    <TableCell className="font-medium">{p.label}{p.hint && <p className="text-[11px] font-normal text-muted-foreground">{p.hint}</p>}</TableCell>
                     <TableCell><StatusChip status={st} />{info?.error && <p className="mt-1 text-xs text-destructive">{info.error}</p>}</TableCell>
                     <TableCell className="font-mono text-xs">{info?.last4 ? `••••${info.last4}` : "—"}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{info?.last_verified_at ? fmtRelative(info.last_verified_at) : "—"}</TableCell>
                     <TableCell className="whitespace-nowrap text-right">
-                      {!readOnly && <Button size="xs" variant="outline" onClick={() => setKeyFor(p.name)}><KeyRound className="h-3 w-3" /> {st === "not_set" ? "Add key" : "Rotate"}</Button>}
+                      {p.keyless ? <span className="text-xs text-muted-foreground">No key needed</span> : !readOnly && <Button size="xs" variant="outline" onClick={() => setKeyFor(p.name)}><KeyRound className="h-3 w-3" /> {st === "not_set" ? "Add key" : "Rotate"}</Button>}
                       {!readOnly && st !== "not_set" && (
                         <Button size="xs" variant="ghost" disabled={test.isPending && test.variables === p.name}
                                 onClick={() => test.mutate(p.name, { onSuccess: (d) => (d?.ok === false || d?.error ? toast.error(`${p.label}: ${d?.error ?? "test failed"}`) : toast.success(`${p.label} OK${d?.latency_ms ? ` · ${d.latency_ms} ms` : ""}`)), onError: (e) => toast.error(errorMessage(e)) })}>Test</Button>

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -9,7 +10,14 @@ from app.config import settings
 from app.core.logging import get_logger
 from app.core.ports.ai_provider import Completion, Message, ToolCall, ToolSpec, Usage
 from app.integrations.ai import base
-from app.integrations.ai.base import ProviderError, Timer, content_text, normalize_messages, split_system
+from app.integrations.ai.base import (
+    ProviderError,
+    Timer,
+    content_text,
+    missing_key_error,
+    normalize_messages,
+    split_system,
+)
 
 log = get_logger("ai.anthropic")
 
@@ -112,6 +120,8 @@ class AnthropicProvider:
     async def complete(self, messages: list[Message], *, model: str, tools: list[ToolSpec] | None = None,
                        response_schema: dict[str, Any] | None = None, temperature: float = 0.3,
                        max_tokens: int = 2048) -> Completion:
+        if not self._api_key and not os.environ.get("ANTHROPIC_API_KEY"):
+            raise missing_key_error("anthropic")
         msgs = normalize_messages(messages)
         if response_schema:
             msgs = base.append_json_instruction(msgs, response_schema)

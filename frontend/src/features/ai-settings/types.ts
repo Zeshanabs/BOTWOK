@@ -44,11 +44,15 @@ export interface UsageRow {
 }
 export interface UsageResponse { items?: UsageRow[]; groups?: UsageRow[]; total_cost_usd?: number | string; from?: string; to?: string }
 
-export const PROVIDERS: { name: string; label: string; kind: "llm" | "search" | "media" }[] = [
+export const PROVIDERS: { name: string; label: string; kind: "llm" | "search" | "media"; hint?: string; keyless?: boolean }[] = [
   { name: "anthropic", label: "Anthropic", kind: "llm" },
   { name: "openai", label: "OpenAI", kind: "llm" },
-  { name: "google", label: "Google", kind: "llm" },
+  { name: "google", label: "Google Gemini", kind: "llm", hint: "Free tier at aistudio.google.com" },
+  { name: "groq", label: "Groq", kind: "llm", hint: "Free developer tier at console.groq.com" },
   { name: "xai", label: "xAI", kind: "llm" },
+  { name: "openrouter", label: "OpenRouter", kind: "llm", hint: "Free models end in :free" },
+  { name: "huggingface", label: "Hugging Face", kind: "llm", hint: "Free inference credits" },
+  { name: "pollinations", label: "Pollinations", kind: "llm", hint: "Public free endpoint, no key needed; used automatically when no key is set", keyless: true },
   { name: "tavily", label: "Tavily (search)", kind: "search" },
   { name: "brave", label: "Brave (search)", kind: "search" },
   { name: "exa", label: "Exa (search)", kind: "search" },

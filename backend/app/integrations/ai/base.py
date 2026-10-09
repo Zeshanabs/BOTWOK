@@ -259,3 +259,26 @@ def make_completion(*, content: str, tool_calls: list[ToolCall], usage: Usage, m
                     finish_reason: str, latency_ms: int, raw: Any = None) -> Completion:
     return Completion(content=content, tool_calls=tool_calls, usage=usage, model=model, provider=provider,
                       finish_reason=finish_reason, latency_ms=latency_ms, raw=raw)
+
+
+# ----------------------------------------------------------------------------- configuration helpers
+
+#: Providers that work without an API key: local models and public free endpoints.
+KEYLESS_PROVIDERS = frozenset({"ollama", "pollinations", "fake"})
+
+PROVIDER_LABELS = {"anthropic": "Anthropic", "openai": "OpenAI", "google": "Google Gemini", "xai": "xAI", "groq": "Groq",
+                   "openrouter": "OpenRouter", "huggingface": "Hugging Face", "pollinations": "Pollinations", "ollama": "Ollama"}
+
+
+def configuration_hint() -> str:
+    """One sentence telling an operator every way to make AI work, used by every "no provider" error."""
+    return ("Add a key in Settings → AI → Provider keys or in .env (ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY with a free "
+            "tier at aistudio.google.com, GROQ_API_KEY with a free tier at console.groq.com, OPENROUTER_API_KEY, HUGGINGFACE_API_KEY), "
+            "run a local model with Ollama (`ollama pull llama3.1`), or set FREE_FALLBACK_MODELS=pollinations/openai to use the "
+            "key-less public endpoint.")
+
+
+def missing_key_error(provider: str) -> ProviderError:
+    label = PROVIDER_LABELS.get(provider, provider)
+    return ProviderError(f"No API key configured for {label}. {configuration_hint()}", provider=provider, status=401,
+                         retryable=False, kind="auth")

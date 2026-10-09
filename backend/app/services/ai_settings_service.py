@@ -16,10 +16,13 @@ from app.config import settings
 from app.core.crypto import seal, unseal
 from app.core.errors import ProblemError, not_found, validation
 from app.core.logging import get_logger
+from app.integrations.ai.base import KEYLESS_PROVIDERS
 from app.integrations.ai.registry import (
+    DEFAULT_MODELS,
     KNOWN_PROVIDERS,
     default_routing,
     env_api_key,
+    free_fallback_specs,
     get_provider,
     merge_routing,
     resolve_model,
@@ -30,7 +33,8 @@ from app.models.platform import UsageBudget, UsageLedger
 log = get_logger("ai.settings")
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "agents" / "prompts"
 SECTIONS = ("routing", "providers", "media", "search", "safety", "budgets")
-PROVIDERS_WITH_KEYS = ("anthropic", "openai", "xai", "google", "openrouter")
+PROVIDERS_WITH_KEYS = ("anthropic", "openai", "google", "xai", "groq", "openrouter", "huggingface")
+KEYLESS_WITH_STATUS = ("pollinations", "ollama")
 
 
 def default_settings() -> dict[str, Any]:
@@ -169,12 +173,17 @@ class AISettingsService:
         rows = (await db.execute(select(ProviderSecret).where(ProviderSecret.workspace_id == workspace_id))).scalars().all()
         by_provider = {r.provider: r for r in rows}
         out: list[dict[str, Any]] = []
-        for p in PROVIDERS_WITH_KEYS + ("ollama",):
+        free = {resolve_model(s)[0] for s in free_fallback_specs()}
+        for p in PROVIDERS_WITH_KEYS + KEYLESS_WITH_STATUS:
             r = by_provider.get(p)
             env = env_api_key(p)
             if p == "ollama":
                 out.append({"provider": p, "configured": True, "source": "local", "last4": None, "verified_at": None,
                             "base_url": settings.ollama_base_url})
+                continue
+            if p == "pollinations":
+                out.append({"provider": p, "configured": True, "source": "free", "last4": r.last4 if r else None, "verified_at": None,
+                            "status": "active", "fallback": p in free, "keyless": True})
                 continue
             if r is not None:
                 out.append({"provider": p, "configured": True, "source": "workspace", "last4": r.last4,
@@ -189,7 +198,7 @@ class AISettingsService:
         from app.core.ports.ai_provider import Message
         provider = provider.lower()
         key = await self.get_provider_key(db, workspace_id, provider)
-        if not key and provider != "ollama":
+        if not key and provider not in KEYLESS_PROVIDERS:
             return {"ok": False, "provider": provider, "error": "no API key configured"}
         routing = (await self.get(db, workspace_id))["routing"]
         if not model:
@@ -198,8 +207,7 @@ class AISettingsService:
                 if p == provider:
                     model = m
                     break
-        model = model or {"anthropic": "claude-haiku-4-5", "openai": "gpt-5-mini", "xai": "grok-3-mini",
-                          "google": "gemini-2.5-flash", "ollama": "llama3.1", "openrouter": "openai/gpt-5-mini"}.get(provider, "")
+        model = model or DEFAULT_MODELS.get(provider, {}).get("cheap", "")
         t0 = time.perf_counter()
         try:
             prov = get_provider(provider, key)

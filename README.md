@@ -30,7 +30,7 @@ Open http://localhost:3000 and sign in with the seeded demo account (`demo@botwo
 
 Nothing is required to browse the app. To run agents, add at least one model provider key either in **Settings → AI → Provider keys** (stored encrypted in the database) or in `.env` (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `XAI_API_KEY`, `GOOGLE_API_KEY`). Model routing per tier (cheap / balanced / powerful) and per agent is editable in the same screen. Search providers (`TAVILY_API_KEY`, `BRAVE_API_KEY`, `EXA_API_KEY`) enable web research; without them a self-hosted SearXNG at `SEARXNG_BASE_URL` is used, and without that research completes with "no usable sources". Embeddings use the OpenAI key or a local Ollama model (`OLLAMA_BASE_URL`).
 
-Without keys every AI run fails fast and the Command Center shows exactly what failed, which step, and the cost (zero).
+**Free options.** Runs pick the routed provider when it has a key, otherwise any provider that has one (with a sensible default model for the tier), otherwise the key-less public endpoint named in `FREE_FALLBACK_MODELS` (default `pollinations/openai`, zero cost, rate-limited, prompts leave your machine; set it empty to disable). Free keyed tiers that work out of the box: Google Gemini (`GOOGLE_API_KEY`, aistudio.google.com), Groq (`GROQ_API_KEY`, console.groq.com), OpenRouter free models (`OPENROUTER_API_KEY`, ids ending in `:free`), Hugging Face (`HUGGINGFACE_API_KEY`). Fully local: install [Ollama](https://ollama.com), run `ollama pull llama3.1`, and route a tier to `ollama/llama3.1`. When nothing at all is configured a run fails fast with a message that lists these options and the Command Center shows which step failed and the cost (zero).
 
 ## Connect social accounts
 
