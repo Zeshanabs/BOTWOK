@@ -38,7 +38,16 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     xai_api_key: str = ""
     google_api_key: str = ""
+    groq_api_key: str = ""
+    openrouter_api_key: str = ""
+    huggingface_api_key: str = ""
+    pollinations_api_key: str = ""
+    # Comma-separated model specs used when no routed provider has a key (key-less public endpoint). Empty disables.
+    free_fallback_models: str = "pollinations/openai"
     ollama_base_url: str = "http://localhost:11434/v1"
+    # One switch to route every tier to a provider's default models (groq, google, openai, anthropic, xai, openrouter,
+    # huggingface, pollinations, ollama); empty keeps the DEFAULT_*_MODEL specs below.
+    ai_provider: str = ""
     default_cheap_model: str = "anthropic/claude-haiku-4-5-20251001"
     default_balanced_model: str = "anthropic/claude-sonnet-5-5"
     default_powerful_model: str = "anthropic/claude-opus-5-5"

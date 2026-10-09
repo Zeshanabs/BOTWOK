@@ -538,38 +538,13 @@ async def notify_admins(db: AsyncSession, workspace_id: UUID, kind: str, title: 
 
 async def ai_configured(db: AsyncSession | None, workspace_id: UUID | None, tier: str = "powerful",
                         agent_id: str | None = None) -> bool:
-    """True when a model routed for ``tier``/``agent_id`` has a usable provider key (workspace secret or env), or is an
-    explicitly routed keyless provider (ollama / fake). No network calls."""
+    """True when some provider can serve ``tier``/``agent_id``: a routed model with a usable key, any provider that has a
+    key, or a key-less fallback (local Ollama, FREE_FALLBACK_MODELS). No network calls."""
     try:
-        from app.integrations.ai.registry import candidate_specs, env_api_key, get_routing, resolve_model
+        from app.integrations.ai.registry import ai_available
     except ImportError:
         return False
-    try:
-        routing = await get_routing(db, workspace_id)
-        specs = candidate_specs(routing, tier, agent_id)
-    except Exception as e:  # noqa: BLE001
-        log.info("ai_configured.routing_failed", error=str(e)[:200])
-        return False
-    for spec in specs:
-        try:
-            provider, _ = resolve_model(spec)
-        except ValueError:
-            continue
-        if provider in ("ollama", "fake"):
-            return True
-        key: str | None = None
-        if db is not None and workspace_id is not None:
-            try:
-                from app.services.ai_settings_service import AISettingsService
-                key = await AISettingsService().get_provider_key(db, workspace_id, provider)
-            except Exception as e:  # noqa: BLE001
-                log.info("ai_configured.key_lookup_failed", provider=provider, error=str(e)[:200])
-                key = env_api_key(provider)
-        else:
-            key = env_api_key(provider)
-        if key:
-            return True
-    return False
+    return await ai_available(db, workspace_id, tier, agent_id)
 
 
 async def start_tool_run(db: AsyncSession, member: Any, *, agent: str, action: str, message: str, brand_id: UUID | None,

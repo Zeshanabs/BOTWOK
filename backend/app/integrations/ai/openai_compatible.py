@@ -8,7 +8,14 @@ from typing import Any
 from app.core.logging import get_logger
 from app.core.ports.ai_provider import Completion, Message, ToolCall, ToolSpec, Usage
 from app.integrations.ai import base
-from app.integrations.ai.base import ProviderError, Timer, content_text, normalize_messages
+from app.integrations.ai.base import (
+    KEYLESS_PROVIDERS,
+    ProviderError,
+    Timer,
+    content_text,
+    missing_key_error,
+    normalize_messages,
+)
 
 log = get_logger("ai.openai_compatible")
 
@@ -26,6 +33,7 @@ class OpenAICompatibleProvider:
         self.name = name
         self._base_url = base_url
         self._api_key = api_key or ("ollama" if name == "ollama" else None)
+        self._keyless = name in KEYLESS_PROVIDERS
         self._timeout_s = timeout_s
         self._client: Any = None
         self._json_schema_supported: bool | None = supports_json_schema
@@ -35,6 +43,12 @@ class OpenAICompatibleProvider:
         if self._client is None:
             from openai import AsyncOpenAI
             kwargs: dict[str, Any] = {"api_key": self._api_key or "missing", "max_retries": 0, "timeout": self._timeout_s}
+            if self._keyless and not self._api_key:
+                import httpx
+
+                async def _strip_auth(request: httpx.Request) -> None:   # public endpoint: no bearer token at all
+                    request.headers.pop("authorization", None)
+                kwargs["http_client"] = httpx.AsyncClient(event_hooks={"request": [_strip_auth]}, timeout=self._timeout_s)
             if self._base_url:
                 kwargs["base_url"] = self._base_url
             if self._extra_headers:
@@ -79,6 +93,8 @@ class OpenAICompatibleProvider:
     async def complete(self, messages: list[Message], *, model: str, tools: list[ToolSpec] | None = None,
                        response_schema: dict[str, Any] | None = None, temperature: float = 0.3,
                        max_tokens: int = 2048) -> Completion:
+        if not self._keyless and not self._api_key:
+            raise missing_key_error(self.name)
         msgs = normalize_messages(messages)
         if response_schema:
             msgs = base.append_json_instruction(msgs, response_schema)
