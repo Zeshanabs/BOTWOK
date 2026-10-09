@@ -157,11 +157,20 @@ def get_provider(provider_name: str, api_key: str | None = None, base_url: str |
 
 # ----------------------------------------------------------------------------- routing
 
+def _tier_default(tier: str, fallback_spec: str) -> str:
+    """AI_PROVIDER=<name> routes the tier to that provider's default model; otherwise the DEFAULT_*_MODEL spec."""
+    p = (settings.ai_provider or "").strip().lower()
+    if p == "local":
+        p = "ollama"
+    model = DEFAULT_MODELS.get(p, {}).get(tier) if p else None
+    return f"{p}/{model}" if model else fallback_spec
+
+
 def default_routing() -> dict[str, Any]:
     return {
-        "cheap": {"primary": settings.default_cheap_model, "fallback": []},
-        "balanced": {"primary": settings.default_balanced_model, "fallback": []},
-        "powerful": {"primary": settings.default_powerful_model, "fallback": []},
+        "cheap": {"primary": _tier_default("cheap", settings.default_cheap_model), "fallback": []},
+        "balanced": {"primary": _tier_default("balanced", settings.default_balanced_model), "fallback": []},
+        "powerful": {"primary": _tier_default("powerful", settings.default_powerful_model), "fallback": []},
         "embeddings": {"primary": settings.default_embedding_model, "fallback": []},
         "per_agent": {},
         "economy_mode": False,

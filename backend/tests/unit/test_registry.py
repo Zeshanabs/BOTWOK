@@ -166,3 +166,21 @@ def test_keyless_provider_sends_no_bearer_token():
     client = p._get_client()
     assert client.base_url.host == "text.pollinations.ai"
     assert client._client.event_hooks["request"], "authorization-stripping hook must be installed"
+
+
+def test_ai_provider_switch_routes_every_tier(monkeypatch):
+    monkeypatch.setattr(settings, "ai_provider", "groq")
+    r = reg.default_routing()
+    assert r["cheap"]["primary"] == "groq/" + reg.DEFAULT_MODELS["groq"]["cheap"]
+    assert r["powerful"]["primary"] == "groq/" + reg.DEFAULT_MODELS["groq"]["powerful"]
+    assert r["embeddings"]["primary"] == settings.default_embedding_model      # embeddings untouched
+    monkeypatch.setattr(settings, "ai_provider", "nope")
+    assert reg.default_routing()["cheap"]["primary"] == settings.default_cheap_model   # unknown name → unchanged
+
+
+async def test_groq_key_alone_runs_everything_on_groq(monkeypatch):
+    _no_keys(monkeypatch, groq_api_key="gsk-test")
+    monkeypatch.setattr(settings, "ai_provider", "groq")
+    for tier in ("cheap", "balanced", "powerful"):
+        cands = await reg.providers_for_tier(None, None, tier, "research")
+        assert cands[0][0].name == "groq" and cands[0][1] == reg.DEFAULT_MODELS["groq"][tier]
