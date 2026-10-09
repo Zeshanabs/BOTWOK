@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { errorMessage } from "@/components/data/async-states";
+import { errorMessage } from "@/components/shared/async-states";
 import { toItems } from "@/lib/formatters";
 import { ideasApi } from "./api";
 import type { GenerateIdeasInput, Idea } from "./types";

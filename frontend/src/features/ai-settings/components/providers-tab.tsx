@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { StatusChip } from "@/components/data/status-chip";
-import { FormError } from "@/components/data/form-errors";
-import { ListSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { FormError } from "@/components/shared/form-errors";
+import { ListSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { fmtRelative } from "@/lib/formatters";
 import { useAgents, useOllama, useProviderActions, useSaveAiSettings } from "../hooks";
 import { PROVIDERS, TIERS, fallbackText, type AiSettings, type Route, type Tier } from "../types";
@@ -94,7 +94,7 @@ export function ProvidersTab({ settings, readOnly }: { settings: AiSettings; rea
                 return (
                   <TableRow key={p.name}>
                     <TableCell className="font-medium">{p.label}</TableCell>
-                    <TableCell><StatusChip status={st} />{info?.error && <p className="mt-1 text-xs text-red-600">{info.error}</p>}</TableCell>
+                    <TableCell><StatusChip status={st} />{info?.error && <p className="mt-1 text-xs text-destructive">{info.error}</p>}</TableCell>
                     <TableCell className="font-mono text-xs">{info?.last4 ? `••••${info.last4}` : "—"}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{info?.last_verified_at ? fmtRelative(info.last_verified_at) : "—"}</TableCell>
                     <TableCell className="whitespace-nowrap text-right">
@@ -119,7 +119,7 @@ export function ProvidersTab({ settings, readOnly }: { settings: AiSettings; rea
         </CardHeader>
         <CardContent className="text-sm">
           {ollama.isLoading ? "Checking…" : ollama.data ? (
-            <div><p className="text-green-700 dark:text-green-300">● Running · {ollama.data.length} model{ollama.data.length === 1 ? "" : "s"}</p>
+            <div><p className="text-success">● Running · {ollama.data.length} model{ollama.data.length === 1 ? "" : "s"}</p>
               {ollama.data.length > 0 && <p className="mt-1 font-mono text-xs text-muted-foreground">{ollama.data.join(", ")}</p>}
               <p className="mt-1 text-xs text-muted-foreground">Use them in routing as <span className="font-mono">ollama/&lt;model&gt;</span>.</p></div>
           ) : <p className="text-muted-foreground">○ Not detected (not running, or the browser blocked the request). The backend may still reach it.</p>}
@@ -145,7 +145,7 @@ export function ProvidersTab({ settings, readOnly }: { settings: AiSettings; rea
       <Card>
         <CardHeader><CardTitle className="text-sm">Per-agent overrides</CardTitle><CardDescription>Leave blank to use the agent&apos;s tier.</CardDescription></CardHeader>
         <CardContent>
-          {sameFamily && <p className="mb-3 flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300"><TriangleAlert className="h-3 w-3" /> The critic should use a different model family than the writer.</p>}
+          {sameFamily && <p className="mb-3 flex items-center gap-1 text-xs text-warning"><TriangleAlert className="h-3 w-3" /> The critic should use a different model family than the writer.</p>}
           {agents.isLoading ? <ListSkeleton rows={6} rowClassName="h-9" /> : agents.error ? <QueryError error={agents.error} onRetry={() => agents.refetch()} title="Couldn't load agents" /> : (
             <div className="grid gap-2 text-sm">
               {(agents.data ?? []).map((a) => (

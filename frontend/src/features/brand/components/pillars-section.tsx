@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { TagInput } from "@/components/data/tag-input";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { ListSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
-import { FormError } from "@/components/data/form-errors";
+import { TagInput } from "@/components/shared/tag-input";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { ListSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
+import { FormError } from "@/components/shared/form-errors";
 import { cn } from "@/lib/utils";
 import { usePillarMutations, usePillars } from "../hooks";
 import type { Pillar, PillarInput } from "../types";
@@ -49,7 +49,7 @@ function PillarRow({ pillar, brandId, readOnly }: { pillar: Pillar; brandId: str
   return (
     <li className="space-y-2 rounded-lg border p-3">
       <PillarEditor draft={draft} onChange={setDraft} readOnly={readOnly} idPrefix={pillar.id} />
-      {(pillar.warnings?.length ?? 0) > 0 && <p className="text-xs text-amber-700 dark:text-amber-300">{pillar.warnings?.join(" · ")}</p>}
+      {(pillar.warnings?.length ?? 0) > 0 && <p className="text-xs text-warning">{pillar.warnings?.join(" · ")}</p>}
       {!readOnly && (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="ghost" onClick={() => setConfirm(true)}><Trash2 className="h-3 w-3" /> Delete</Button>
@@ -77,9 +77,9 @@ export function PillarsSection({ brandId, readOnly }: { brandId: string; readOnl
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-sm"><span>Target shares</span><span className={cn("tabular-nums", ok ? "text-green-700 dark:text-green-300" : "text-amber-700 dark:text-amber-300")}>{total}% of 100%</span></div>
+        <div className="flex items-center justify-between text-sm"><span>Target shares</span><span className={cn("tabular-nums", ok ? "text-success" : "text-warning")}>{total}% of 100%</span></div>
         <Progress value={Math.min(100, total)} aria-label="Sum of pillar target shares" />
-        {!ok && list.length > 0 && <p className="text-xs text-amber-700 dark:text-amber-300">Shares should sum to 100% so ideation can weight under-served pillars correctly.</p>}
+        {!ok && list.length > 0 && <p className="text-xs text-warning">Shares should sum to 100% so ideation can weight under-served pillars correctly.</p>}
       </div>
       {!list.length && <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">No pillars yet. Most brands use 3–6 (e.g. Educational, Behind the scenes, Product).</p>}
       <ul className="space-y-3">{list.map((p) => <PillarRow key={p.id} pillar={p} brandId={brandId} readOnly={readOnly} />)}</ul>

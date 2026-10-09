@@ -13,9 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { EmptyState } from "@/components/data/empty-state";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { AiBadge } from "@/features/common/components/ai-badge";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError, SkeletonRows } from "@/features/common/components/query-state";
@@ -123,7 +123,7 @@ export function MediaLibrary() {
                   <MediaThumb asset={a} className={cn("aspect-square w-full ring-primary transition group-hover:ring-2", selected.has(a.id) && "ring-2")} />
                   <p className="mt-1 truncate text-xs font-medium">{a.ai_generated && <Sparkles className="mr-0.5 inline h-3 w-3 text-ai" />}{assetName(a)}</p>
                   <p className="truncate text-[11px] text-muted-foreground">
-                    {a.status === "failed" ? <span className="text-red-600">{a.error ?? "failed"}</span> : <>
+                    {a.status === "failed" ? <span className="text-destructive">{a.error ?? "failed"}</span> : <>
                       {a.width && a.height ? `${a.width}×${a.height}` : a.kind}{aspectLabel(a.width, a.height) ? ` · ${aspectLabel(a.width, a.height)}` : ""}
                       {" · "}{a.usage_count != null ? (a.usage_count ? `used ${a.usage_count}×` : "unused") : a.source === "derived" ? `${a.platform_target ?? "derived"} rendition` : fmtBytes(a.bytes)}
                     </>}
@@ -197,7 +197,7 @@ export function AssetDetailSheet({ id, onOpenChange }: { id: string | null; onOp
           {a && (
             <>
               <MediaThumb asset={a} fit="contain" className="aspect-square w-full" />
-              {a.status === "failed" && <p className="rounded-md bg-red-50 p-2 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-200">Processing failed: {a.error ?? "unknown error"}</p>}
+              {a.status === "failed" && <p className="rounded-md bg-destructive/[0.06] p-2 text-sm text-destructive">Processing failed: {a.error ?? "unknown error"}</p>}
               {a.ai_generated && (
                 <section className="space-y-1 text-xs">
                   <div className="flex items-center gap-2"><AiBadge meta={{ provider: a.provider, model: a.model, cost_usd: a.cost_usd, run_id: a.ai_run_id }} label="Generated" /><span className="text-muted-foreground">{[a.provider, a.model].filter(Boolean).join(" · ")}</span></div>
@@ -240,7 +240,7 @@ export function AssetDetailSheet({ id, onOpenChange }: { id: string | null; onOp
                 )}
                 {canCreate && a.kind === "image" && <Button size="sm" variant="outline" onClick={() => removeBg.mutate()} disabled={removeBg.isPending}>{removeBg.isPending ? <Loader2 className="animate-spin" /> : <Eraser />} Remove bg</Button>}
                 {href && <Button size="sm" variant="outline" asChild><a href={href} download={assetName(a)} target="_blank" rel="noreferrer"><Download /> Download</a></Button>}
-                {canManage && <Button size="sm" variant="ghost" className="text-red-600" onClick={() => setConfirmDel(true)}><Trash2 /> Delete</Button>}
+                {canManage && <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setConfirmDel(true)}><Trash2 /> Delete</Button>}
               </div>
             </>
           )}

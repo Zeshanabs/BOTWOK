@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { QueryError } from "@/features/common/components/query-state";
 import { useActiveBrand, useBrands, useCampaigns } from "@/features/common/hooks";
 import type { ListResponse } from "@/features/common/types";
@@ -118,13 +118,13 @@ export function GenerateReportWizard({ open, onOpenChange, initialKind, onCreate
             )}
             <div className="space-y-1.5"><Label htmlFor="r-brief">Brief <span className="text-muted-foreground">(optional)</span></Label><Textarea id="r-brief" rows={2} value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Focus on LinkedIn carousels vs single images" /></div>
             <div className="space-y-1.5"><Label htmlFor="r-title">Title <span className="text-muted-foreground">(optional)</span></Label><Input id="r-title" value={title} onChange={(e) => setTitle(e.target.value)} /></div>
-            {errs.period_start && <p className="text-xs text-red-600">{errs.period_start}</p>}
+            {errs.period_start && <p className="text-xs text-destructive">{errs.period_start}</p>}
           </div>
         )}
         {step === 2 && (
           <div className="space-y-3">
             <div className="space-y-1.5"><Label htmlFor="r-emails">Email recipients</Label><Input id="r-emails" value={emails} onChange={(e) => setEmails(e.target.value)} placeholder="sam@acme.com, dana@acme.com" aria-invalid={invalidEmails.length > 0} />
-              {invalidEmails.length > 0 && <p className="text-xs text-red-600">Invalid: {invalidEmails.join(", ")}</p>}{errs.recipients && <p className="text-xs text-red-600">{errs.recipients}</p>}</div>
+              {invalidEmails.length > 0 && <p className="text-xs text-destructive">Invalid: {invalidEmails.join(", ")}</p>}{errs.recipients && <p className="text-xs text-destructive">{errs.recipients}</p>}</div>
             <div className="space-y-1.5"><Label htmlFor="r-slack">Slack channel <span className="text-muted-foreground">(if Slack is connected)</span></Label><Input id="r-slack" value={slack} onChange={(e) => setSlack(e.target.value)} placeholder="#marketing" /></div>
             <div className="space-y-1.5"><Label>Format</Label><Select value={format} onValueChange={(v) => setFormat(v as typeof format)}><SelectTrigger className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pdf">PDF</SelectItem><SelectItem value="markdown">Markdown</SelectItem><SelectItem value="link">Link only</SelectItem></SelectContent></Select></div>
             <p className="text-xs text-muted-foreground">Leave empty to only keep the report in Botwok.</p>

@@ -23,7 +23,7 @@ export function MediaStrip({ assets, onAdd, onGenerate, disabled }: { assets: Co
         {onGenerate && <Button type="button" variant="outline" size="sm" className="h-16 w-16 flex-col gap-1 text-xs" onClick={onGenerate} disabled={disabled}><Sparkles className="text-ai" /> AI</Button>}
       </div>
       {images.length > 0 && (
-        <p className={described < images.length ? "text-xs text-amber-700 dark:text-amber-300" : "text-xs text-muted-foreground"}>
+        <p className={described < images.length ? "text-xs text-warning" : "text-xs text-muted-foreground"}>
           Alt text {described < images.length ? "⚠" : "✓"} {described} of {images.length} image{images.length === 1 ? "" : "s"} described
         </p>
       )}

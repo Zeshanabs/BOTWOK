@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { FormError } from "@/components/data/form-errors";
-import { errorMessage } from "@/components/data/async-states";
+import { FormError } from "@/components/shared/form-errors";
+import { errorMessage } from "@/components/shared/async-states";
 import { useSaveSettings } from "../hooks";
 import type { Brand, BrandSettings, BrandSettingsUpdate } from "../types";
 

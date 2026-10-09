@@ -6,9 +6,9 @@ import { toast } from "sonner";
 import { Check, ExternalLink, FileText, PauseCircle, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { StatusChip } from "@/components/data/status-chip";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { errorMessage } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { errorMessage } from "@/components/shared/async-states";
 import { domainOf, fmtDate, truncate } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useSession } from "@/stores/session";
@@ -31,9 +31,9 @@ export function ActionsPanel({ actions }: { actions: RunAction[] }) {
       {actions.map((a) => {
         const pending = a.status === "pending";
         return (
-          <li key={a.approval_id} className={pending ? "rounded-lg border border-amber-300 bg-amber-50/60 p-3 dark:border-amber-800 dark:bg-amber-950/30" : "rounded-lg border p-3"}>
+          <li key={a.approval_id} className={pending ? "rounded-lg border border-warning/40 bg-warning/[0.08]/60 p-3" : "rounded-lg border p-3"}>
             <div className="flex items-start gap-2">
-              {pending && <PauseCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden />}
+              {pending && <PauseCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden />}
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{a.description}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">

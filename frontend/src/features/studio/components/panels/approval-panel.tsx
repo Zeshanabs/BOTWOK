@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { StatusChip } from "@/components/data/status-chip";
+import { StatusChip } from "@/components/shared/status-chip";
 import { QueryError, SkeletonRows } from "@/features/common/components/query-state";
 import { usePermissions } from "@/features/common/hooks";
 import type { ContentStatus } from "@/features/common/types";
@@ -18,7 +18,7 @@ import { policyFlags, type ContentItem } from "../../api";
 import { useApprovalHistory, contentKeys } from "../../hooks";
 import { useAllowedTransitions } from "../status-menu";
 
-const RISK: Record<string, string> = { low: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200", medium: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200", high: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200" };
+const RISK: Record<string, string> = { low: "bg-success/12 text-success  ", medium: "bg-warning/12 text-warning  ", high: "bg-destructive/10 text-destructive  " };
 
 /** Approval tab: status, risk, request approval, role-gated transitions, decision on a pending approval, history. */
 export function ApprovalPanel({ content, onRequestApproval, onTransition, transitionPending }: {
@@ -64,14 +64,14 @@ export function ApprovalPanel({ content, onRequestApproval, onTransition, transi
         </div>
       )}
       {pending && (
-        <div className="space-y-2 rounded-md border border-amber-300 bg-amber-50/50 p-3 dark:border-amber-800 dark:bg-amber-900/10">
+        <div className="space-y-2 rounded-md border border-warning/40 bg-warning/[0.08]/50 p-3">
           <p className="text-sm font-medium">Waiting for approval</p>
           <p className="text-xs text-muted-foreground">Requested {relTime(pending.created_at)}{pending.requested_by_name ? ` by ${pending.requested_by_name}` : ""}{pending.expires_at ? ` · expires ${relTime(pending.expires_at)}` : ""}</p>
           {typeof (pending.payload?.comment ?? pending.payload?.note) === "string" && <p className="text-xs italic">“{String(pending.payload?.comment ?? pending.payload?.note)}”</p>}
           {canApprove ? (
             <>
               {flags.length > 0 && (
-                <label className="flex items-start gap-2 text-xs text-red-700 dark:text-red-300">
+                <label className="flex items-start gap-2 text-xs text-destructive">
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} className="mt-0.5" />
                   <span><ShieldAlert className="mr-1 inline h-3.5 w-3.5" />I acknowledge {flags.length} policy flag(s): {flags.map((f) => f.message).join("; ")}</span>
                 </label>

@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { StatusChip } from "@/components/data/status-chip";
-import { NotAvailable, ListSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { NotAvailable, ListSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { fmtDateTime, fmtRelative, fmtUsd, humanize, truncate } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useCosts, useEvents, useHealth, useJobs, useRetryJob } from "../hooks";
@@ -32,7 +32,7 @@ export function AdminPanel() {
             {Object.entries(health.data?.checks ?? {}).map(([name, c]) => (
               <Card key={name} className="gap-1 py-3">
                 <CardContent className="space-y-1 px-4 text-sm">
-                  <p className="flex items-center gap-1 font-medium">{c.ok ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-600" />}{humanize(name)}</p>
+                  <p className="flex items-center gap-1 font-medium">{c.ok ? <CheckCircle2 className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-destructive" />}{humanize(name)}</p>
                   <p className="text-xs text-muted-foreground">{c.ok ? "OK" : "Problem"}{c.latency_ms != null ? ` · ${c.latency_ms} ms` : ""}</p>
                   {c.detail && <p className="text-xs">{c.detail}</p>}
                 </CardContent>

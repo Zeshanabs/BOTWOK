@@ -2,7 +2,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PageHeader } from "@/components/data/page-header";
+import { PageHeader } from "@/components/shared/page-header";
 import { useCan } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/stores/session";

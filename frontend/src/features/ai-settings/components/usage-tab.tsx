@@ -5,7 +5,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ListSkeleton, QueryError } from "@/components/data/async-states";
+import { ListSkeleton, QueryError } from "@/components/shared/async-states";
 import { fmtCompact, fmtDate, fmtUsd, toNumber } from "@/lib/formatters";
 import { useUsage } from "../hooks";
 import { usageKey, usageTokens, type UsageRow } from "../types";

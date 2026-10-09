@@ -8,9 +8,9 @@ import { Check, ExternalLink, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
-import { errorMessage, isNotAvailable } from "@/components/data/async-states";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
+import { errorMessage, isNotAvailable } from "@/components/shared/async-states";
 import { PLATFORMS } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/stores/session";
@@ -125,16 +125,16 @@ export function ConnectStep({ onNext, onBack, brandId }: StepProps & { brandId: 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">Connecting happens on each platform&apos;s own sign-in page. Here is what each one requires — you can connect now or later from Settings › Social Accounts.</p>
-      {connected.length > 0 && <p className="flex items-center gap-1 text-sm text-green-700 dark:text-green-300"><Check className="h-4 w-4" /> {connected.length} account{connected.length === 1 ? "" : "s"} connected</p>}
+      {connected.length > 0 && <p className="flex items-center gap-1 text-sm text-success"><Check className="h-4 w-4" /> {connected.length} account{connected.length === 1 ? "" : "s"} connected</p>}
       <ul className="grid gap-2 sm:grid-cols-2">
         {PLATFORMS.map((p) => {
           const r = REQUIREMENTS[p.id];
           const isConnected = connected.some((a) => a.platform === p.id);
           return (
             <li key={p.id} className="rounded-lg border p-3 text-sm">
-              <p className="flex items-center gap-2 font-medium"><PlatformIcon platform={p.id} size={20} /> {p.label}{isConnected && <Check className="h-4 w-4 text-green-600" aria-label="Connected" />}</p>
+              <p className="flex items-center gap-2 font-medium"><PlatformIcon platform={p.id} size={20} /> {p.label}{isConnected && <Check className="h-4 w-4 text-success" aria-label="Connected" />}</p>
               <p className="mt-1 text-xs text-muted-foreground">{r?.summary}</p>
-              {r?.notes?.[0] && <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">{r.notes[0]}</p>}
+              {r?.notes?.[0] && <p className="mt-1 text-xs text-warning">{r.notes[0]}</p>}
             </li>
           );
         })}
@@ -229,7 +229,7 @@ export function DoneStep({ brandId }: { brandId: string | null }) {
   return (
     <div className="space-y-5">
       <ul className="space-y-2 text-sm">
-        {items.map((i) => <li key={i.label} className="flex items-center gap-2">{i.done ? <Check className="h-4 w-4 text-green-600" /> : <span className="h-4 w-4 rounded-full border" aria-hidden />}<span className={i.done ? "" : "text-muted-foreground"}>{i.label}{!i.done && " — you can finish this later"}</span></li>)}
+        {items.map((i) => <li key={i.label} className="flex items-center gap-2">{i.done ? <Check className="h-4 w-4 text-success" /> : <span className="h-4 w-4 rounded-full border" aria-hidden />}<span className={i.done ? "" : "text-muted-foreground"}>{i.label}{!i.done && " — you can finish this later"}</span></li>)}
       </ul>
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={() => router.push(`/w/${slug}/dashboard`)}>Go to dashboard</Button>

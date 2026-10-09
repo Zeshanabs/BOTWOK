@@ -5,7 +5,7 @@ import { ArrowLeft, Download, FileDown, Loader2, RefreshCw, Sparkles } from "luc
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StatusChip } from "@/components/data/status-chip";
+import { StatusChip } from "@/components/shared/status-chip";
 import { CostPill } from "@/features/common/components/ai-badge";
 import { NotAvailable, QueryError } from "@/features/common/components/query-state";
 import { RunCard } from "@/features/common/components/run-card";
@@ -87,7 +87,7 @@ export function ReportViewer({ id }: { id: string }) {
       {sections.map((s, i) => (
         <section key={s.key ?? i} aria-labelledby={`sec-${i}`} className="border-t pt-4">
           <h2 id={`sec-${i}`} className="flex items-center gap-2 text-lg font-semibold"><span className="text-muted-foreground tabular-nums">{i + 1}</span> {s.title}{s.ai_generated !== false && <Sparkles className="h-4 w-4 text-ai" aria-label="AI-written" />}</h2>
-          {s.status === "failed" && <p className="mt-1 text-sm text-red-600">This section failed: {s.error ?? "unknown error"}</p>}
+          {s.status === "failed" && <p className="mt-1 text-sm text-destructive">This section failed: {s.error ?? "unknown error"}</p>}
           {(s.markdown ?? s.body_md ?? s.body) && <MarkdownView markdown={s.markdown ?? s.body_md ?? s.body ?? ""} />}
           {s.table && (
             <div className="my-3 overflow-x-auto rounded-md border">

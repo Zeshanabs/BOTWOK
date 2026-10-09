@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
 import { BrandSelect } from "@/features/brand/components/brand-select";
 import { useCan } from "@/lib/permissions";
 import { cn } from "@/lib/utils";

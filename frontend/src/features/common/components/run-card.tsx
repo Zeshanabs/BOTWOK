@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Ban, CheckCircle2, ChevronDown, ChevronRight, Circle, ExternalLink, Loader2, PauseCircle, Sparkles, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StatusChip } from "@/components/data/status-chip";
+import { StatusChip } from "@/components/shared/status-chip";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { AiRun, ListResponse } from "../types";
@@ -15,10 +15,10 @@ import { errorMessage, fmtInt, fmtUsd, toItems } from "../utils";
 interface ToolCall { id?: string; tool_name: string; side_effect?: string; args_summary?: string; result_summary?: string; status: string; duration_ms?: number }
 
 export function TaskGlyph({ status }: { status: string }) {
-  if (status === "succeeded" || status === "completed") return <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-label="succeeded" />;
-  if (status === "failed") return <XCircle className="h-4 w-4 text-red-600" aria-label="failed" />;
-  if (status === "running" || status === "planning") return <Loader2 className="h-4 w-4 animate-spin text-blue-600" aria-label="running" />;
-  if (status === "awaiting_approval" || status === "paused" || status === "waiting") return <PauseCircle className="h-4 w-4 text-amber-600" aria-label="awaiting approval" />;
+  if (status === "succeeded" || status === "completed") return <CheckCircle2 className="h-4 w-4 text-success" aria-label="succeeded" />;
+  if (status === "failed") return <XCircle className="h-4 w-4 text-destructive" aria-label="failed" />;
+  if (status === "running" || status === "planning") return <Loader2 className="h-4 w-4 animate-spin text-info" aria-label="running" />;
+  if (status === "awaiting_approval" || status === "paused" || status === "waiting") return <PauseCircle className="h-4 w-4 text-warning" aria-label="awaiting approval" />;
   if (status === "skipped" || status === "cancelled") return <Ban className="h-4 w-4 text-muted-foreground" aria-label={status} />;
   return <Circle className="h-4 w-4 text-muted-foreground" aria-label="pending" />;
 }
@@ -75,7 +75,7 @@ export function RunCard({ runId, title, onDone, className, compact }: {
         <span className="min-w-0 flex-1 truncate font-medium">{title ?? runTitle(run)}</span>
         {run ? <StatusChip status={String(run.status)} /> : isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
       </div>
-      {error && <p className="mt-2 text-xs text-red-600">{errorMessage(error)}</p>}
+      {error && <p className="mt-2 text-xs text-destructive">{errorMessage(error)}</p>}
       {run && (
         <>
           {active && (
@@ -99,13 +99,13 @@ export function RunCard({ runId, title, onDone, className, compact }: {
           )}
           {tasks.some((t) => t.error) && (
             <ul className="mt-2 space-y-1">
-              {tasks.filter((t) => t.error).map((t) => <li key={t.key} className="rounded bg-red-50 px-2 py-1 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-200">{t.label}: {t.error}</li>)}
+              {tasks.filter((t) => t.error).map((t) => <li key={t.key} className="rounded bg-destructive/[0.06] px-2 py-1 text-xs text-destructive">{t.label}: {t.error}</li>)}
             </ul>
           )}
           {summary && !compact && <p className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-2 text-xs">{summary}</p>}
-          {run.error && <p className="mt-2 rounded-md bg-red-50 p-2 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-200">{run.error}</p>}
+          {run.error && <p className="mt-2 rounded-md bg-destructive/[0.06] p-2 text-xs text-destructive">{run.error}</p>}
           {actions.length > 0 && (
-            <div className="mt-2 rounded-md border border-amber-300 bg-amber-50 p-2 text-xs dark:border-amber-800 dark:bg-amber-900/20">
+            <div className="mt-2 rounded-md border border-warning/40 bg-warning/[0.08] p-2 text-xs">
               <p className="font-medium">Needs approval</p>
               <ul className="mt-1 space-y-1">{actions.map((a, i) => <li key={a.approval_id ?? i} className="flex items-center gap-2"><StatusChip status={a.status} /><span>{a.description}</span></li>)}</ul>
               <Link href={ws("approvals")} className="mt-1 inline-block text-primary hover:underline">Open approvals ↗</Link>

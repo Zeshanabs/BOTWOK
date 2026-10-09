@@ -7,8 +7,8 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AlertTriangle, ExternalLink } from "lucide-react";
-import { StatusChip } from "@/components/data/status-chip";
-import { QueryError } from "@/components/data/async-states";
+import { StatusChip } from "@/components/shared/status-chip";
+import { QueryError } from "@/components/shared/async-states";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fmtDuration, fmtUsd, msSince } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export function RunProgress({ runId, title, compact, onFinished, className }: Ru
       </ul>
 
       {(run.error || failedTasks.length > 0) && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200" role="alert">
+        <div className="rounded-md border border-destructive/40 bg-destructive/[0.06] p-3 text-destructive" role="alert">
           <p className="flex items-center gap-1 font-medium"><AlertTriangle className="h-4 w-4" /> What failed</p>
           {failedTasks.map((t) => <p key={t.key} className="mt-1 text-xs">Step “{t.label}”{t.error ? `: ${t.error}` : ""}</p>)}
           {run.error && <p className="mt-1 text-xs">{run.error}</p>}

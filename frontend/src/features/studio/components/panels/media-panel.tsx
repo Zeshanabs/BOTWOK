@@ -69,7 +69,7 @@ export function MediaPanel({ content, variant, segs, onSegsChange, seedPrompt }:
               <MediaThumb asset={{ id: a.media_asset_id, ...(a.media ?? {}) }} className="h-12 w-12" />
               <div className="min-w-0 flex-1 text-xs">
                 <p className="truncate font-medium">{a.role.replace(/_/g, " ")} · #{a.position + 1}{a.media?.ai_generated && <span className="ml-1 text-ai">✦ AI</span>}</p>
-                <p className={(a.alt_text ?? a.media?.alt_text) ? "truncate text-muted-foreground" : "text-amber-700 dark:text-amber-300"}>{a.alt_text ?? a.media?.alt_text ?? "No alt text"}</p>
+                <p className={(a.alt_text ?? a.media?.alt_text) ? "truncate text-muted-foreground" : "text-warning"}>{a.alt_text ?? a.media?.alt_text ?? "No alt text"}</p>
                 {a.media?.width && <p className="text-muted-foreground">{a.media.width}×{a.media.height}</p>}
               </div>
               {canCreate && (

@@ -14,10 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { EmptyState } from "@/components/data/empty-state";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { QueryError } from "@/features/common/components/query-state";
 import { useActiveBrand, usePermissions, usePillars, useWorkspacePath } from "@/features/common/hooks";
 import { CONTENT_FORMATS, CONTENT_STATUSES, type ContentFormat, type ListResponse } from "@/features/common/types";
@@ -143,7 +143,7 @@ export function NewContentDialog({ open, onOpenChange, brandId, onCreated, defau
       <DialogContent>
         <DialogHeader><DialogTitle>New content</DialogTitle><DialogDescription>Creates a master post. Platform versions are added from the editor.</DialogDescription></DialogHeader>
         <form id="new-content" className="space-y-3" onSubmit={(e) => { e.preventDefault(); if (title.trim()) create.mutate(); }}>
-          <div className="space-y-1.5"><Label htmlFor="nc-title">Title</Label><Input id="nc-title" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Q4 cold brew launch" aria-invalid={!!errs.title} />{errs.title && <p className="text-xs text-red-600">{errs.title}</p>}</div>
+          <div className="space-y-1.5"><Label htmlFor="nc-title">Title</Label><Input id="nc-title" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Q4 cold brew launch" aria-invalid={!!errs.title} />{errs.title && <p className="text-xs text-destructive">{errs.title}</p>}</div>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="space-y-1.5"><Label>Format</Label><Select value={format} onValueChange={(v) => setFormat(v as ContentFormat)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{CONTENT_FORMATS.map((f) => <SelectItem key={f} value={f}>{f.replace(/_/g, " ")}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-1.5"><Label>Type</Label><Select value={type} onValueChange={setType}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value={ALL}>—</SelectItem>{CONTENT_TYPES.map((t) => <SelectItem key={t} value={t}>{t.replace(/_/g, " ")}</SelectItem>)}</SelectContent></Select></div>
@@ -151,8 +151,8 @@ export function NewContentDialog({ open, onOpenChange, brandId, onCreated, defau
           </div>
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={useAi} onCheckedChange={(c) => setUseAi(c === true)} /><Sparkles className="h-4 w-4 text-ai" /> Draft it with AI (writer · powerful tier)</label>
           {useAi && <Textarea rows={3} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="What should the post say? Audience, angle, sources to cite…" aria-label="Prompt" />}
-          {create.error && !Object.keys(errs).length && <p className="text-sm text-red-600">{errorMessage(create.error)}</p>}
-          {errs._ && <p className="text-sm text-red-600">{errs._}</p>}
+          {create.error && !Object.keys(errs).length && <p className="text-sm text-destructive">{errorMessage(create.error)}</p>}
+          {errs._ && <p className="text-sm text-destructive">{errs._}</p>}
         </form>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

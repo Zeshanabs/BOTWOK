@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { StatusChip } from "@/components/data/status-chip";
+import { StatusChip } from "@/components/shared/status-chip";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError } from "@/features/common/components/query-state";
 import { TaskGlyph } from "@/features/common/components/run-card";
@@ -175,7 +175,7 @@ function BuilderInner({ id, initial, types, builtinTypes, initiallyMissing }: { 
         <Input value={name} onChange={(e) => { setName(e.target.value); markDirty(); }} disabled={!canManage} aria-label="Automation name" className="h-9 w-full max-w-sm border-transparent text-lg font-semibold shadow-none hover:border-input" />
         <StatusChip status={status === "active" ? "active" : status === "paused" ? "paused" : "draft"} />
         {initial.version != null && <span className="text-xs text-muted-foreground">v{initial.version}{initial.updated_at ? ` · saved ${relTime(initial.updated_at)}` : ""}</span>}
-        {dirty && <span className="text-xs text-amber-700 dark:text-amber-300">● unsaved</span>}
+        {dirty && <span className="text-xs text-warning">● unsaved</span>}
         <div className="ml-auto flex flex-wrap gap-2">
           {canManage && <Button size="sm" variant="ghost" onClick={applyTemplate}><LayoutTemplate /> News → LinkedIn template</Button>}
           <Button size="sm" variant="outline" disabled={isNew || missing} onClick={() => setTestOpen(true)} title={missing ? "Needs the automation backend" : undefined}><FlaskConical /> Test run</Button>
@@ -193,8 +193,8 @@ function BuilderInner({ id, initial, types, builtinTypes, initiallyMissing }: { 
       {!canManage && <p className="text-sm text-muted-foreground">Read-only — owners and admins edit automations.</p>}
       {canManage && !wide && <p className="text-sm text-muted-foreground">The builder is read-only on small screens. Runs, enable/disable and cancel still work.</p>}
       {issues.length > 0 && (
-        <div className="rounded-md border border-amber-300 bg-amber-50 p-2 text-xs dark:border-amber-800 dark:bg-amber-900/20" role="status">
-          <p className="mb-1 flex items-center gap-1 font-medium"><AlertTriangle className="h-3.5 w-3.5 text-amber-600" /> {issues.length} issue{issues.length === 1 ? "" : "s"} block enabling</p>
+        <div className="rounded-md border border-warning/40 bg-warning/[0.08] p-2 text-xs" role="status">
+          <p className="mb-1 flex items-center gap-1 font-medium"><AlertTriangle className="h-3.5 w-3.5 text-warning" /> {issues.length} issue{issues.length === 1 ? "" : "s"} block enabling</p>
           <ul className="space-y-0.5">{issues.map((i, k) => <li key={k}>{i.node_key ? <button type="button" className="text-left underline-offset-2 hover:underline" onClick={() => focusNode(i.node_key as string)}>{i.message}</button> : i.message}</li>)}</ul>
         </div>
       )}
@@ -240,7 +240,7 @@ function BuilderInner({ id, initial, types, builtinTypes, initiallyMissing }: { 
                   {nodeType?.description && <p className="text-xs text-muted-foreground">{nodeType.description}</p>}
                   <div className="space-y-1"><Label htmlFor="node-label" className="text-xs">Name</Label><Input id="node-label" className="h-8" value={node.data.label} disabled={!editable} onChange={(e) => updateNode(node.id, { label: e.target.value })} /></div>
                   <ConfigForm key={node.id} nodeType={nodeType} config={node.data.config} onChange={(c) => updateNode(node.id, { config: c })} disabled={!editable} errors={issues.filter((i) => i.node_key === node.id).map((i) => i.message)} />
-                  {nodeType?.branches && <p className="text-[11px] text-muted-foreground">Branches: {nodeType.branches.join(" / ")} — drag from the matching handle.</p>}
+                  {nodeType?.branches && <p className="text-[11px] text-muted-foreground">Branches: {nodeType.branches.join(" /")} — drag from the matching handle.</p>}
                   <p className="font-mono text-[10px] text-muted-foreground">key: {node.id}</p>
                 </>
               ) : edge ? (
@@ -260,7 +260,7 @@ function BuilderInner({ id, initial, types, builtinTypes, initiallyMissing }: { 
                       <SelectContent><SelectItem value="stop">stop</SelectItem><SelectItem value="continue">continue</SelectItem><SelectItem value="notify">notify</SelectItem></SelectContent></Select></div>
                   <div className="space-y-1"><Label htmlFor="max-cost" className="text-xs">Max cost per run (USD)</Label><Input id="max-cost" type="number" step="0.01" className="h-8" value={String(settings.max_cost_usd ?? "")} disabled={!canManage} onChange={(e) => { setSettings((s) => ({ ...s, max_cost_usd: e.target.value === "" ? undefined : Number(e.target.value) })); markDirty(); }} /></div>
                   <div className="flex items-center justify-between gap-2"><Label htmlFor="autonomy" className="text-xs">Autonomous actions (schedule/publish/webhook)</Label><Switch id="autonomy" checked={autonomous} onCheckedChange={(c) => { setAutonomous(c); markDirty(); }} disabled={!canManage} /></div>
-                  {autonomous && <p className="text-[11px] text-amber-700 dark:text-amber-300">Side-effect nodes may run without a person clicking. Approval nodes and the AI-content approval policy still apply.</p>}
+                  {autonomous && <p className="text-[11px] text-warning">Side-effect nodes may run without a person clicking. Approval nodes and the AI-content approval policy still apply.</p>}
                 </div>
               )}
             </TabsContent>
@@ -285,13 +285,13 @@ function BuilderInner({ id, initial, types, builtinTypes, initiallyMissing }: { 
                           <div className="flex items-center gap-2"><StatusChip status={run.data.status} />{run.data.dry_run && <span className="rounded bg-muted px-1">dry run — side effects simulated</span>}
                             {["running", "waiting", "awaiting_approval"].includes(run.data.status) && <Button size="xs" variant="ghost" className="ml-auto" onClick={() => cancelRun.mutate(run.data!.id)}><Ban /> Cancel run</Button>}</div>
                           <p className="text-muted-foreground">Started {fmtDateTime(run.data.started_at)}{run.data.finished_at ? ` · took ${Math.max(1, Math.round((new Date(run.data.finished_at).getTime() - new Date(run.data.started_at).getTime()) / 1000))}s` : ""} · {fmtUsd(run.data.cost_usd)}</p>
-                          {run.data.error && <p className="text-red-600">{run.data.error}</p>}
+                          {run.data.error && <p className="text-destructive">{run.data.error}</p>}
                           <ol className="space-y-1">
                             {(run.data.steps ?? []).map((s, i) => (
                               <li key={s.id ?? i}>
                                 <details className="rounded border p-1.5">
                                   <summary className="flex cursor-pointer items-center gap-1.5"><TaskGlyph status={s.status} /><button type="button" className="hover:underline" onClick={(e) => { e.preventDefault(); focusNode(s.node_key); }}>{nodes.find((n) => n.id === s.node_key)?.data.label ?? s.node_key}</button>{(s.attempts ?? 0) > 1 && <span className="text-muted-foreground">×{s.attempts}</span>}</summary>
-                                  {s.error && <p className="mt-1 text-red-600">{s.error}</p>}
+                                  {s.error && <p className="mt-1 text-destructive">{s.error}</p>}
                                   {s.ai_run_id && <Link className="mt-1 block text-primary hover:underline" href={ws(`command-center/${s.ai_run_id}`)}>AI run ↗</Link>}
                                   {s.input != null && <pre className="mt-1 max-h-32 overflow-auto rounded bg-muted p-1 text-[10px]">in: {JSON.stringify(s.input, null, 2)}</pre>}
                                   {s.output != null && <pre className="mt-1 max-h-32 overflow-auto rounded bg-muted p-1 text-[10px]">out: {JSON.stringify(s.output, null, 2)}</pre>}

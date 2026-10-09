@@ -9,10 +9,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmptyState } from "@/components/data/empty-state";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { QueryError } from "@/features/common/components/query-state";
 import { useBrands, useMediaQuery, usePermissions } from "@/features/common/hooks";
 import { errorMessage, errorStatus, relTime, toItems } from "@/features/common/utils";
@@ -139,7 +139,7 @@ export function ApprovalsInbox() {
                   <p className="flex items-center gap-1 text-sm font-medium">{approvalPlatforms(a).slice(0, 4).map((p) => <PlatformIcon key={p} platform={p} size={14} />)}<span className="truncate">{approvalTitle(a)}</span></p>
                   <p className="text-xs text-muted-foreground">
                     {isAiRequested(a) && <Sparkles className="mr-0.5 inline h-3 w-3 text-ai" aria-label="AI-assisted" />}{a.requested_by_name ?? (a.requested_by === userId ? "you" : "requested")} · {relTime(a.created_at)}{a.expires_at ? ` · expires ${relTime(a.expires_at)}` : ""}
-                    {warned(a) && <span className="ml-1 text-amber-700 dark:text-amber-300">⚠</span>}
+                    {warned(a) && <span className="ml-1 text-warning">⚠</span>}
                   </p>
                 </button>
                 {tab === "decided" && <StatusChip status={a.status} />}

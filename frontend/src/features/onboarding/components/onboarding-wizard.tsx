@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Check, Radar } from "lucide-react";
+import { Check } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
+import { AppLoading } from "@/components/layout/shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { refreshSession } from "@/lib/api";
@@ -36,9 +38,9 @@ function Wizard() {
   const meta = STEPS[step - 1];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-dvh bg-background">
       <header className="flex items-center justify-between border-b bg-background px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-2"><Radar className="h-5 w-5 text-primary" /><span className="font-semibold">Botwok</span></div>
+        <Logo />
         {step >= 3 && slug && <Link href={`/w/${slug}/dashboard`} className="text-sm text-muted-foreground hover:text-foreground">Exit to dashboard</Link>}
       </header>
       <main className="mx-auto max-w-3xl px-4 pb-24 pt-6 sm:px-6">
@@ -64,7 +66,7 @@ function Wizard() {
           </ol>
         </nav>
         <Card>
-          <CardHeader><CardTitle className="text-xl">{meta.heading}</CardTitle><CardDescription>{meta.description}</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="font-display text-xl font-bold tracking-tight">{meta.heading}</CardTitle><CardDescription>{meta.description}</CardDescription></CardHeader>
           <CardContent>
             {step === 1 && <WorkspaceStep onNext={next} />}
             {step === 2 && <BrandStep onNext={next} onBack={back} />}
@@ -88,6 +90,6 @@ export function OnboardingWizard() {
     if (!hydrated || accessToken) return;
     refreshSession().then((ok) => { if (!ok) router.replace("/login?next=/onboarding"); });
   }, [hydrated, accessToken, router]);
-  if (!hydrated || !accessToken) return <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
+  if (!hydrated || !accessToken) return <AppLoading />;
   return <Wizard />;
 }

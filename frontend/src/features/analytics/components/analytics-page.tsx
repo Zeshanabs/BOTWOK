@@ -14,12 +14,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmptyState } from "@/components/data/empty-state";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { QueryError } from "@/features/common/components/query-state";
 import { RunCard } from "@/features/common/components/run-card";
 import { useActiveBrand, usePermissions, useWorkspacePath } from "@/features/common/hooks";
-import { downloadText, errorMessage, errorStatus, fmtCompact, fmtDate, fmtInt, fmtPct, isNotAvailable, relTime, toCsv, toItems } from "@/features/common/utils";
+import { downloadText, errorMessage, errorStatus, fmtCompact, fmtDate, fmtInt, fmtPct, isNotAvailable, relTime, toCsv } from "@/features/common/utils";
 import { PLATFORMS, platformMeta } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { analyticsApi, normalizeAccounts, normalizeBreakdown, normalizeInsights, normalizeOverview, normalizePosts, PERIODS, periodRange, pickKpis, seriesFromPosts, type AnalyticsFilter, type PostPerf, type SeriesPoint } from "../api";
@@ -176,7 +176,7 @@ export function AnalyticsPage() {
         </Card>
         <Card className="gap-2">
           <CardHeader className="flex flex-row items-center justify-between"><CardTitle className="text-sm">By {byTab}</CardTitle>
-            <Tabs value={byTab} onValueChange={(v) => setByTab(v as "pillar" | "format")}><TabsList className="h-7"><TabsTrigger value="pillar" className="text-xs">Pillar</TabsTrigger><TabsTrigger value="format" className="text-xs">Format</TabsTrigger></TabsList></Tabs>
+            <Tabs value={byTab} onValueChange={(v) => setByTab(v as"pillar" | "format")}><TabsList className="h-7"><TabsTrigger value="pillar" className="text-xs">Pillar</TabsTrigger><TabsTrigger value="format" className="text-xs">Format</TabsTrigger></TabsList></Tabs>
           </CardHeader>
           <CardContent>{byOther.isLoading ? <Skeleton className="h-48" /> : byOther.error ? <QueryError error={byOther.error} onRetry={() => byOther.refetch()} notAvailableText="Breakdowns aren't available yet." /> : <BarBreakdown groups={otherB.groups} />}
             {otherB.basis && <p className="mt-1 text-[11px] text-muted-foreground">{otherB.basis}</p>}</CardContent>
@@ -225,9 +225,9 @@ export function AnalyticsPage() {
                 <TableBody>
                   {accountRows.map((a, i) => (
                     <TableRow key={a.id ?? a.social_account_id ?? i}>
-                      <TableCell><span className="flex items-center gap-1.5"><PlatformIcon platform={a.platform} size={16} />{a.display_name ?? platformMeta(a.platform).label}</span>{a.error && <span className="block text-[11px] text-red-600">{a.error} <Link className="underline" href={ws("settings/social-accounts")}>Fix</Link></span>}</TableCell>
+                      <TableCell><span className="flex items-center gap-1.5"><PlatformIcon platform={a.platform} size={16} />{a.display_name ?? platformMeta(a.platform).label}</span>{a.error && <span className="block text-[11px] text-destructive">{a.error} <Link className="underline" href={ws("settings/social-accounts")}>Fix</Link></span>}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtInt(a.followers)}</TableCell>
-                      <TableCell className={cn("text-right tabular-nums", (a.followers_delta ?? 0) > 0 ? "text-emerald-700 dark:text-emerald-400" : (a.followers_delta ?? 0) < 0 ? "text-red-700 dark:text-red-400" : "")}>{a.followers_delta == null ? "n/a" : `${a.followers_delta > 0 ? "+" : ""}${fmtInt(a.followers_delta)}`}</TableCell>
+                      <TableCell className={cn("text-right tabular-nums", (a.followers_delta ?? 0) > 0 ? "text-success" : (a.followers_delta ?? 0) < 0 ? "text-destructive" : "")}>{a.followers_delta == null ? "n/a" : `${a.followers_delta > 0 ? "+" : ""}${fmtInt(a.followers_delta)}`}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtCompact(a.impressions)}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtCompact(a.reach)}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{relTime(a.last_synced_at)}</TableCell>

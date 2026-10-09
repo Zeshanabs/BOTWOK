@@ -3,8 +3,8 @@ import { useState } from "react";
 import { AlertTriangle, GitCompare, Plus, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { SkeletonRows } from "@/features/common/components/query-state";
 import { relTime, toItems, validationIssues } from "@/features/common/utils";
 import { platformMeta } from "@/lib/platforms";
@@ -56,7 +56,7 @@ export function Navigator({ content, selected, onSelect, onAddPlatform, onCompar
                       className={cn("flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-accent", selected === v.id && "bg-primary/5 ring-1 ring-primary")}>
                 <PlatformIcon platform={v.platform} size={18} />
                 <span className="min-w-0 flex-1 truncate">{platformMeta(v.platform).label}</span>
-                {(over || errors.length > 0) && <span className="flex items-center gap-0.5 text-xs text-red-600" title={over ? `${over.label} ${over.used}/${over.limit}` : errors.map((e) => e.message).join("; ")}><AlertTriangle className="h-3 w-3" />{over ? over.used : errors.length}</span>}
+                {(over || errors.length > 0) && <span className="flex items-center gap-0.5 text-xs text-destructive" title={over ? `${over.label} ${over.used}/${over.limit}` : errors.map((e) => e.message).join("; ")}><AlertTriangle className="h-3 w-3" />{over ? over.used : errors.length}</span>}
                 <StatusChip status={v.status} className="shrink-0" />
               </button>
             </li>

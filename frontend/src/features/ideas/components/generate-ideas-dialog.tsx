@@ -6,9 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
-import { isNotAvailable } from "@/components/data/async-states";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
+import { isNotAvailable } from "@/components/shared/async-states";
 import { PLATFORMS } from "@/lib/platforms";
 import { usePillars } from "@/features/brand/hooks";
 import { useGenerateIdeas } from "../hooks";

@@ -1,7 +1,7 @@
 "use client";
 import { useDraggable } from "@dnd-kit/core";
 import { AlertTriangle, Lock, Pause, Sparkles } from "lucide-react";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { statusLabel } from "@/lib/status";
 import { cn } from "@/lib/utils";
 import { MediaThumb } from "@/features/media/components/media-thumb";
@@ -21,7 +21,7 @@ export function CardBody({ card, tz, compact }: { card: Card; tz: string; compac
           {card.platform && <PlatformIcon platform={card.platform} size={14} />}
           {t && <span className="font-medium tabular-nums">{timeLabel(t, tz)}</span>}
           {card.ai_generated && <Sparkles className="h-3 w-3 text-ai" aria-label="AI-created" />}
-          {(card.warnings ?? []).length > 0 && <AlertTriangle className="h-3 w-3 text-amber-600" aria-label={(card.warnings ?? []).map((w) => w.message).join("; ")} />}
+          {(card.warnings ?? []).length > 0 && <AlertTriangle className="h-3 w-3 text-warning" aria-label={(card.warnings ?? []).map((w) => w.message).join("; ")} />}
           {(sched === "paused" || card.paused) && <Pause className="h-3 w-3 text-muted-foreground" aria-label="paused" />}
           {mode === "locked" && <Lock className="ml-auto h-3 w-3 text-muted-foreground" aria-label="not movable" />}
         </div>

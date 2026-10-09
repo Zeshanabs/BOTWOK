@@ -24,7 +24,7 @@ export function HashtagInput({ value, onChange, banned = [], cap, recommended, d
         {value.map((t) => {
           const isBanned = bannedSet.has(t.toLowerCase());
           return (
-            <span key={t} className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs", isBanned ? "bg-red-100 text-red-800 line-through dark:bg-red-900/40 dark:text-red-200" : "bg-secondary")} title={isBanned ? "Banned by brand policy" : undefined}>
+            <span key={t} className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs", isBanned ? "bg-destructive/10 text-destructive line-through" : "bg-secondary")} title={isBanned ? "Banned by brand policy" : undefined}>
               {t}
               {!disabled && <button type="button" aria-label={`Remove ${t}`} onClick={() => onChange(value.filter((x) => x !== t))} className="rounded-full hover:bg-black/10"><X className="h-3 w-3" /></button>}
             </span>
@@ -40,7 +40,7 @@ export function HashtagInput({ value, onChange, banned = [], cap, recommended, d
                onPaste={(e) => { const t = e.clipboardData.getData("text"); if (/[\s,]/.test(t)) { e.preventDefault(); add(t); } }} />
       </div>
       {(cap != null || recommended != null) && (
-        <p className={cn("mt-1 text-xs", over ? "text-red-600" : "text-muted-foreground")}>
+        <p className={cn("mt-1 text-xs", over ? "text-destructive" : "text-muted-foreground")}>
           {value.length} hashtag{value.length === 1 ? "" : "s"}{cap != null ? ` · max ${cap}` : ""}{recommended != null ? ` · recommended ≤ ${recommended}` : ""}
         </p>
       )}

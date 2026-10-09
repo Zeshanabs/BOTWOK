@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ListSkeleton } from "@/components/data/async-states";
+import { ListSkeleton } from "@/components/shared/async-states";
 import { ResearchView } from "@/features/research/components/research-view";
 
 export default function ResearchPage() {

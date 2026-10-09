@@ -10,10 +10,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { AvailabilityBadge } from "@/components/data/availability-badge";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { QueryError, errorMessage } from "@/components/data/async-states";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { AvailabilityBadge } from "@/components/shared/availability-badge";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { QueryError, errorMessage } from "@/components/shared/async-states";
 import { domainOf, fmtCompact, fmtRelative } from "@/lib/formatters";
 import { platformMeta } from "@/lib/platforms";
 import { useCan } from "@/lib/permissions";
@@ -91,7 +91,7 @@ export function CompetitorDetail({ id }: { id: string }) {
                 </>
               )}
               <AvailabilityBadge availability={p.availability} reason={p.availability_reason ?? p.reason} />
-              {p.last_error && <p className="text-xs text-red-700 dark:text-red-300">{p.last_error}</p>}
+              {p.last_error && <p className="text-xs text-destructive">{p.last_error}</p>}
               {p.last_synced_at && <p className="text-[11px] text-muted-foreground">collected {fmtRelative(p.last_synced_at)}</p>}
             </CardContent>
           </Card>

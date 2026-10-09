@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StatusChip } from "@/components/data/status-chip";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { usePermissions, useSocialAccounts, useWorkspacePath } from "@/features/common/hooks";
 import { fromLocalInput, timezoneOptions, toLocalInput, tzParts } from "@/features/common/tz";
@@ -112,14 +112,14 @@ export function ScheduleForm({ variant, contentApproved, brandId, defaultTz, def
             </SelectContent>
           </Select>
         )}
-        {account && account.status !== "active" && <p className="text-xs text-red-600">Account is {account.status}. <Link className="underline" href={ws("settings/social-accounts")}>Reconnect</Link></p>}
-        {errs.social_account_id && <p className="text-xs text-red-600">{errs.social_account_id}</p>}
+        {account && account.status !== "active" && <p className="text-xs text-destructive">Account is {account.status}. <Link className="underline" href={ws("settings/social-accounts")}>Reconnect</Link></p>}
+        {errs.social_account_id && <p className="text-xs text-destructive">{errs.social_account_id}</p>}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor={`when-${variant.id}`}>Date & time</Label>
           <Input id={`when-${variant.id}`} type="datetime-local" value={when} min={nowMin} onChange={(e) => setWhen(e.target.value)} disabled={disabled} aria-invalid={!!errs.scheduled_at} />
-          {errs.scheduled_at && <p className="text-xs text-red-600">{errs.scheduled_at}</p>}
+          {errs.scheduled_at && <p className="text-xs text-destructive">{errs.scheduled_at}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Timezone</Label>
@@ -127,7 +127,7 @@ export function ScheduleForm({ variant, contentApproved, brandId, defaultTz, def
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>{timezoneOptions([defaultTz, tz]).map((z) => <SelectItem key={z} value={z}>{z}</SelectItem>)}</SelectContent>
           </Select>
-          {errs.timezone && <p className="text-xs text-red-600">{errs.timezone}</p>}
+          {errs.timezone && <p className="text-xs text-destructive">{errs.timezone}</p>}
         </div>
       </div>
       <div className="space-y-2">
@@ -152,7 +152,7 @@ export function ScheduleForm({ variant, contentApproved, brandId, defaultTz, def
           </div>
         )}
         {slots && slots.length > 0 && <p className="text-[11px] text-muted-foreground">Basis: {bestResult?.evidence ?? (Array.from(new Set(slots.map((s) => s.basis).filter(Boolean))).join(" · ") || "engagement by weekday × hour")}{bestResult?.min_gap_minutes ? ` · min gap ${bestResult.min_gap_minutes} min` : ""}</p>}
-        {bestResult?.token_expires_at && <p className="text-[11px] text-amber-700 dark:text-amber-300">Token expires {fmtDateTime(bestResult.token_expires_at, tz)} — slots after that are excluded.</p>}
+        {bestResult?.token_expires_at && <p className="text-[11px] text-warning">Token expires {fmtDateTime(bestResult.token_expires_at, tz)} — slots after that are excluded.</p>}
       </div>
       {generalErrs.length > 0 && (
         <Alert variant="destructive">
@@ -160,7 +160,7 @@ export function ScheduleForm({ variant, contentApproved, brandId, defaultTz, def
           <AlertDescription><ul className="list-disc pl-4">{generalErrs.map(([k, v]) => <li key={k}><span className="font-mono text-xs">{k === "_" ? "" : `${k}: `}</span>{v}</li>)}</ul></AlertDescription>
         </Alert>
       )}
-      {schedule.error && generalErrs.length === 0 && Object.keys(errs).length === 0 && <p className="text-sm text-red-600">{errorMessage(schedule.error)}</p>}
+      {schedule.error && generalErrs.length === 0 && Object.keys(errs).length === 0 && <p className="text-sm text-destructive">{errorMessage(schedule.error)}</p>}
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => schedule.mutate()} disabled={disabled || !effectiveAccount || !when || schedule.isPending || account?.status !== "active"}>
           {schedule.isPending ? <Loader2 className="animate-spin" /> : <CalendarClock />} Schedule

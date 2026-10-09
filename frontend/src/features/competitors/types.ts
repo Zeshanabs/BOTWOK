@@ -1,5 +1,5 @@
 /** Competitor types (doc 17 §Competitors; backend/app/models/competitor.py). */
-import type { Availability } from "@/components/data/availability-badge";
+import type { Availability } from "@/components/shared/availability-badge";
 
 export interface CompetitorProfile {
   id: string;

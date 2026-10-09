@@ -15,8 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { AiBadge } from "@/features/common/components/ai-badge";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { QueryError } from "@/features/common/components/query-state";
@@ -186,9 +186,9 @@ function EditorWorkspace({ content }: { content: ContentItem }) {
   );
 
   const saveState = drafts.saving ? <span className="flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" /> Saving…</span>
-    : drafts.saveError ? <span className="flex items-center gap-1 text-red-600" title={drafts.saveError}><AlertTriangle className="h-3 w-3" /> Not saved — kept locally, retrying</span>
-    : drafts.dirty ? <span className="flex items-center gap-1 text-amber-700 dark:text-amber-300">● Unsaved changes</span>
-    : <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-600" /> {drafts.savedAt ? `Saved ${new Date(drafts.savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "All changes saved"} · v{content.current_version}</span>;
+    : drafts.saveError ? <span className="flex items-center gap-1 text-destructive" title={drafts.saveError}><AlertTriangle className="h-3 w-3" /> Not saved — kept locally, retrying</span>
+    : drafts.dirty ? <span className="flex items-center gap-1 text-warning">● Unsaved changes</span>
+    : <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-success" /> {drafts.savedAt ? `Saved ${new Date(drafts.savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "All changes saved"} · v{content.current_version}</span>;
 
   return (
     <div className="pb-24 lg:pb-4">
@@ -215,7 +215,7 @@ function EditorWorkspace({ content }: { content: ContentItem }) {
               <DropdownMenuItem onClick={() => setCompare({ open: true })}><GitCompare /> Compare versions</DropdownMenuItem>
               {content.generation_metadata?.run_id && <DropdownMenuItem asChild><Link href={ws(`command-center/${content.generation_metadata.run_id}`)}><History /> AI runs</Link></DropdownMenuItem>}
               {perms.canManage && content.status !== "archived" && <DropdownMenuItem onClick={() => transition("archived")}>Archive</DropdownMenuItem>}
-              {perms.canManage && <><DropdownMenuSeparator /><DropdownMenuItem className="text-red-600" onClick={() => setConfirmDelete(true)}><Trash2 /> Delete</DropdownMenuItem></>}
+              {perms.canManage && <><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive" onClick={() => setConfirmDelete(true)}><Trash2 /> Delete</DropdownMenuItem></>}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -255,7 +255,7 @@ function EditorWorkspace({ content }: { content: ContentItem }) {
               {variantList.map((v) => (
                 <button key={v.id} type="button" role="tab" aria-selected={selected === v.id} onClick={() => select(v.id)} title={`${platformMeta(v.platform).label} · ${v.format.replace(/_/g, " ")} · ${v.status.replace(/_/g, " ")}`}
                         className={cn("flex items-center gap-1 rounded-md border px-1.5 py-1 text-sm", selected === v.id ? "border-primary bg-primary/5" : "hover:bg-accent")}>
-                  <PlatformIcon platform={v.platform} size={18} />{drafts.dirtyVariantIds.includes(v.id) && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-label="unsaved" />}
+                  <PlatformIcon platform={v.platform} size={18} />{drafts.dirtyVariantIds.includes(v.id) && <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-label="unsaved" />}
                 </button>
               ))}
               {perms.canCreate && <Button size="icon-sm" variant="ghost" aria-label="Add platform version" onClick={() => setRepurpose({ open: true })}><Plus /></Button>}
@@ -367,7 +367,7 @@ function MasterFields({ drafts, readOnly, bannedTags, masterAssets, openMedia }:
   const m = drafts.master;
   const set = (p: Partial<typeof m>) => drafts.setMaster((cur) => ({ ...cur, ...p }));
   const bodyChars = Array.from(stripMarkdown(m.body_md)).length;
-  const counter = (n: number, max: number) => <span className={cn("text-xs tabular-nums", n > max ? "text-red-600" : "text-muted-foreground")}>{n}/{max}</span>;
+  const counter = (n: number, max: number) => <span className={cn("text-xs tabular-nums", n > max ? "text-destructive" : "text-muted-foreground")}>{n}/{max}</span>;
   return (
     <div className="space-y-5">
       <div className="space-y-1.5">

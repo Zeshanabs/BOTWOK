@@ -7,8 +7,8 @@ import { CheckCircle2, FileText, Loader2, Plus, Repeat, XCircle } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageHeader } from "@/components/data/page-header";
-import { StatusChip } from "@/components/data/status-chip";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusChip } from "@/components/shared/status-chip";
 import { CostPill } from "@/features/common/components/ai-badge";
 import { NotAvailable, QueryError } from "@/features/common/components/query-state";
 import { useActiveBrand, useBrands, usePermissions, useWorkspacePath } from "@/features/common/hooks";
@@ -38,7 +38,7 @@ export function ReportsList() {
   });
   const items = toItems(list.data);
   const scheduled = items.filter((r) => r.schedule);
-  const icon = (s?: string) => (s === "running" || s === "queued" ? <Loader2 className="h-4 w-4 animate-spin text-blue-600" aria-label={s} /> : s === "failed" ? <XCircle className="h-4 w-4 text-red-600" aria-label="failed" /> : <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-label="completed" />);
+  const icon = (s?: string) => (s === "running" || s === "queued" ? <Loader2 className="h-4 w-4 animate-spin text-info" aria-label={s} /> : s === "failed" ? <XCircle className="h-4 w-4 text-destructive" aria-label="failed" /> : <CheckCircle2 className="h-4 w-4 text-success" aria-label="completed" />);
 
   return (
     <div>
@@ -75,7 +75,7 @@ export function ReportsList() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{r.title}</p>
                       <p className="text-xs text-muted-foreground">{kindLabel(r.kind)}{r.period_start ? ` · ${fmtDate(r.period_start)} – ${fmtDate(r.period_end)}` : ""} · {relTime(r.created_at)}</p>
-                      {r.status === "failed" && r.error && <p className="text-xs text-red-600">{r.error}</p>}
+                      {r.status === "failed" && r.error && <p className="text-xs text-destructive">{r.error}</p>}
                     </div>
                     {r.schedule && <Repeat className="h-4 w-4 text-muted-foreground" aria-label="recurring" />}
                     <CostPill usd={r.cost_usd} />

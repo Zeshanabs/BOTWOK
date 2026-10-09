@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
-import { Sparkline } from "@/components/data/sparkline";
-import { EmptyState } from "@/components/data/empty-state";
-import { CardGridSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
+import { Sparkline } from "@/components/shared/sparkline";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CardGridSkeleton, QueryError, errorMessage, isNotAvailable } from "@/components/shared/async-states";
 import { fmtRelative, score100, toNumber } from "@/lib/formatters";
 import { PLATFORMS } from "@/lib/platforms";
 import { useCan } from "@/lib/permissions";
@@ -125,7 +125,7 @@ export function TrendsView() {
                 <CardHeader className="flex flex-row items-start justify-between gap-2">
                   <CardTitle className="text-base">
                     <button type="button" className="text-left hover:underline" onClick={() => setOpen(t.id)}>
-                      {vel !== null && vel < 0 ? <TrendingDown className="mr-1 inline h-4 w-4 text-red-600" /> : <TrendingUp className="mr-1 inline h-4 w-4 text-green-600" />}{t.label}
+                      {vel !== null && vel < 0 ? <TrendingDown className="mr-1 inline h-4 w-4 text-destructive" /> : <TrendingUp className="mr-1 inline h-4 w-4 text-success" />}{t.label}
                     </button>
                   </CardTitle>
                   <span className="shrink-0 text-sm font-semibold tabular-nums">Score {score100(t.score) ?? "—"}</span>
@@ -133,7 +133,7 @@ export function TrendsView() {
                 <CardContent className="space-y-2 text-sm">
                   <div className="flex flex-wrap items-center gap-3">
                     <Sparkline values={sparkValues(t)} />
-                    {vel !== null && <span className={vel >= 0 ? "text-xs text-green-700 dark:text-green-300" : "text-xs text-red-700 dark:text-red-300"}>{vel >= 0 ? "+" : ""}{(Math.abs(vel) <= 1 ? vel * 100 : vel).toFixed(0)}%/wk</span>}
+                    {vel !== null && <span className={vel >= 0 ? "text-xs text-success" : "text-xs text-destructive"}>{vel >= 0 ? "+" : ""}{(Math.abs(vel) <= 1 ? vel * 100 : vel).toFixed(0)}%/wk</span>}
                     <StatusChip status={trendState(t)} />
                   </div>
                   {(t.source_counts || t.sources_count != null) && (

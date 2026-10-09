@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { QueryError, errorMessage } from "@/components/data/async-states";
+import { QueryError, errorMessage } from "@/components/shared/async-states";
 import { domainOf, fmtDate, fmtDateTime } from "@/lib/formatters";
 import { useCan } from "@/lib/permissions";
 import { useResearchSource, useSaveSource } from "../hooks";

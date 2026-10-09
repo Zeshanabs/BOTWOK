@@ -14,7 +14,7 @@ export function MediaThumb({ asset, className, fit = "cover", rounded = true }: 
   const kind = asset.kind ?? (asset.mime?.split("/")[0] || "image");
   const base = cn("relative flex items-center justify-center overflow-hidden bg-muted", rounded && "rounded-md", className);
   if (asset.status === "processing") return <div className={base}><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-label="Processing" /></div>;
-  if (asset.status === "failed") return <div className={base} title={asset.error ?? "Processing failed"}><AlertTriangle className="h-5 w-5 text-red-600" aria-label="Failed" /></div>;
+  if (asset.status === "failed") return <div className={base} title={asset.error ?? "Processing failed"}><AlertTriangle className="h-5 w-5 text-destructive" aria-label="Failed" /></div>;
   if (kind === "image" && src) {
     return (
       <div className={base}>

@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FieldError, FormError, problemFieldErrors } from "@/components/data/form-errors";
-import { errorStatus } from "@/components/data/async-states";
+import { FieldError, FormError, problemFieldErrors } from "@/components/shared/form-errors";
+import { errorStatus } from "@/components/shared/async-states";
 import { api, refreshSession } from "@/lib/api";
 import { useSession, type Membership, type User } from "@/stores/session";
 import { teamApi } from "../api";
@@ -79,7 +79,7 @@ export function AcceptInvite({ token }: { token: string }) {
           {phase === "checking" && <CardContent className="py-10 text-center text-sm text-muted-foreground">Checking your session…</CardContent>}
           {phase === "done" && done && (
             <>
-              <CardHeader><CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-green-600" /> You&apos;re in</CardTitle><CardDescription>You joined {done.name} as {done.role}.</CardDescription></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-success" /> You&apos;re in</CardTitle><CardDescription>You joined {done.name} as {done.role}.</CardDescription></CardHeader>
               <CardContent><Button className="w-full" onClick={() => router.replace(`/w/${done.slug}/dashboard`)}>Open {done.name}</Button></CardContent>
             </>
           )}

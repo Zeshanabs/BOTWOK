@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ListSkeleton } from "@/components/data/async-states";
+import { ListSkeleton } from "@/components/shared/async-states";
 import { SystemView } from "@/features/system/components/system-view";
 
 export default function SystemSettingsPage() {

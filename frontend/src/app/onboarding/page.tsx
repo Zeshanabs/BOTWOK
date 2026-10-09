@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { OnboardingWizard } from "@/features/onboarding/components/onboarding-wizard";
+import { AppLoading } from "@/components/layout/shell";
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>}>
+    <Suspense fallback={<AppLoading />}>
       <OnboardingWizard />
     </Suspense>
   );

@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { StatusChip } from "@/components/data/status-chip";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { StatusChip } from "@/components/shared/status-chip";
 import { ConfirmDialog } from "@/features/common/components/confirm-dialog";
 import { usePermissions, useWorkspacePath } from "@/features/common/hooks";
 import { fromLocalInput, toLocalInput } from "@/features/common/tz";
@@ -47,10 +47,10 @@ export function CardSheet({ card, tz, onOpenChange, onMove }: { card: CalendarCa
             <div className="space-y-4 px-4 pb-6 text-sm">
               <div className="flex flex-wrap items-center gap-2"><StatusChip status={card.status} />{card.content_status && card.content_status !== card.status && <span className="text-xs text-muted-foreground">content: {card.content_status.replace(/_/g, " ")}</span>}{card.ai_generated && <span className="flex items-center gap-1 text-xs text-ai"><Sparkles className="h-3 w-3" /> AI-created</span>}</div>
               <p className="flex items-center gap-2"><CalendarClock className="h-4 w-4 text-muted-foreground" />{t ? `${fmtDateTime(t, tz, { weekday: "short" })} (${tz})` : "No time set"}{!card.scheduled_post_id && t && <span className="text-xs text-muted-foreground">planned date</span>}</p>
-              {card.last_error && <p className="rounded-md bg-red-50 p-2 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-200">Last error: {card.last_error}</p>}
+              {card.last_error && <p className="rounded-md bg-destructive/[0.06] p-2 text-xs text-destructive">Last error: {card.last_error}</p>}
               {card.published_url && <a className="inline-flex items-center gap-1 text-sm text-primary hover:underline" href={card.published_url} target="_blank" rel="noreferrer">View on {card.platform ? platformMeta(card.platform).label : "platform"} <ExternalLink className="h-3 w-3" /></a>}
               {card.created_by_name && <p className="text-xs text-muted-foreground">Scheduled by {card.created_by_name}</p>}
-              {(card.warnings ?? []).length > 0 && <ul className="space-y-1 rounded-md border border-amber-300 bg-amber-50 p-2 text-xs dark:border-amber-800 dark:bg-amber-900/20">{card.warnings?.map((w, i) => <li key={i}>⚠ {w.message}</li>)}</ul>}
+              {(card.warnings ?? []).length > 0 && <ul className="space-y-1 rounded-md border border-warning/40 bg-warning/[0.08] p-2 text-xs">{card.warnings?.map((w, i) => <li key={i}>⚠ {w.message}</li>)}</ul>}
               {canSchedule && movable && (
                 <div className="space-y-1.5">
                   <Label htmlFor="resched">Reschedule</Label>
@@ -58,7 +58,7 @@ export function CardSheet({ card, tz, onOpenChange, onMove }: { card: CalendarCa
                     <Input id="resched" type="datetime-local" value={value} onChange={(e) => setWhen(e.target.value)} />
                     <Button disabled={!when} onClick={() => { const iso = fromLocalInput(value, tz); if (iso) { onMove(card, iso); setWhen(null); onOpenChange(false); } }}>Move</Button>
                   </div>
-                  {sched === "queued" && <p className="text-xs text-amber-700 dark:text-amber-300">Already queued — moving removes it from the queue.</p>}
+                  {sched === "queued" && <p className="text-xs text-warning">Already queued — moving removes it from the queue.</p>}
                 </div>
               )}
               {!movable && sched && <p className="text-xs text-muted-foreground">{sched === "failed" ? "Failed posts are handled in Publishing." : `A ${sched} post can't be moved.`}{sched === "failed" && <Link className="ml-1 text-primary hover:underline" href={ws("publishing?status=failed")}>Open Publishing</Link>}</p>}
@@ -66,7 +66,7 @@ export function CardSheet({ card, tz, onOpenChange, onMove }: { card: CalendarCa
                 <Button asChild variant="outline" size="sm"><Link href={ws(`studio/${card.content_item_id}${card.platform ? `?variant=${card.platform}` : ""}`)}><ExternalLink /> Open in Studio</Link></Button>
                 {canSchedule && postId && sched === "scheduled" && <Button size="sm" variant="outline" onClick={() => act.mutate("pause")} disabled={act.isPending}><Pause /> Pause</Button>}
                 {canSchedule && postId && sched === "paused" && <Button size="sm" variant="outline" onClick={() => act.mutate("resume")} disabled={act.isPending}><Play /> Resume</Button>}
-                {canSchedule && postId && ["scheduled", "queued", "paused", "failed"].includes(sched ?? "") && <Button size="sm" variant="ghost" className="text-red-600" onClick={() => setConfirmCancel(true)}><Ban /> Cancel post</Button>}
+                {canSchedule && postId && ["scheduled", "queued", "paused", "failed"].includes(sched ?? "") && <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setConfirmCancel(true)}><Ban /> Cancel post</Button>}
                 {act.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               </div>
             </div>

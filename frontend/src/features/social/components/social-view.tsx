@@ -7,10 +7,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PageHeader } from "@/components/data/page-header";
-import { PlatformIcon } from "@/components/data/platform-icon";
-import { ConfirmDialog } from "@/components/data/confirm-dialog";
-import { CardGridSkeleton, QueryError, errorMessage } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { PlatformIcon } from "@/components/shared/platform-icon";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { CardGridSkeleton, QueryError, errorMessage } from "@/components/shared/async-states";
 import { ApiError } from "@/lib/api";
 import { PLATFORMS, platformMeta } from "@/lib/platforms";
 import { useCan } from "@/lib/permissions";
@@ -151,7 +151,7 @@ export function SocialView() {
         })}
       >
         {conflict && (
-          <div className="space-y-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          <div className="space-y-2 rounded-md bg-warning/[0.08] p-3 text-sm text-warning">
             <p>{conflict}</p>
             <label className="flex items-center gap-2"><Checkbox checked={force} onCheckedChange={(c) => setForce(!!c)} /> Cancel those scheduled posts and disconnect anyway</label>
           </div>

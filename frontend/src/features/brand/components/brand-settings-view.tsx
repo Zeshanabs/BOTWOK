@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { PageHeader } from "@/components/data/page-header";
-import { EmptyState } from "@/components/data/empty-state";
-import { QueryError } from "@/components/data/async-states";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
+import { QueryError } from "@/components/shared/async-states";
 import { useCan } from "@/lib/permissions";
 import { useSession } from "@/stores/session";
 import { useActiveBrandId, useBrand, useBrandSettings, useBrands } from "../hooks";

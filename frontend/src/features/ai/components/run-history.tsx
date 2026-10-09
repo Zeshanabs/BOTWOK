@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ListSkeleton, QueryError } from "@/components/data/async-states";
+import { ListSkeleton, QueryError } from "@/components/shared/async-states";
 import { fmtRelative, fmtUsd, truncate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/stores/session";

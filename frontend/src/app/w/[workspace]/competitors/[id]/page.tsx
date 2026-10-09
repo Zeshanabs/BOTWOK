@@ -1,7 +1,7 @@
 "use client";
 import { Suspense } from "react";
 import { useParams } from "next/navigation";
-import { ListSkeleton } from "@/components/data/async-states";
+import { ListSkeleton } from "@/components/shared/async-states";
 import { CompetitorDetail } from "@/features/competitors/components/competitor-detail";
 
 export default function CompetitorDetailPage() {

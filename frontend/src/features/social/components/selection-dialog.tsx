@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ListSkeleton, QueryError } from "@/components/data/async-states";
-import { FormError } from "@/components/data/form-errors";
+import { ListSkeleton, QueryError } from "@/components/shared/async-states";
+import { FormError } from "@/components/shared/form-errors";
 import { PLATFORMS, platformMeta } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { useSelection, useSocialMutations } from "../hooks";
@@ -59,7 +59,7 @@ export function SelectionDialog({ token, platform: initialPlatform, onClose }: {
                       <span className="block truncate font-medium">{a.display_name ?? a.handle ?? a.external_id}</span>
                       <span className="block truncate text-xs text-muted-foreground">{[a.handle && `@${a.handle}`, a.account_type, a.linked_page && `Page: ${a.linked_page}`].filter(Boolean).join(" · ")}</span>
                       {a.already_connected && <span className="text-xs text-muted-foreground">Already connected</span>}
-                      {a.disabled_reason && <span className="text-xs text-amber-700">{a.disabled_reason}</span>}
+                      {a.disabled_reason && <span className="text-xs text-warning">{a.disabled_reason}</span>}
                     </span>
                   </button>
                 </li>

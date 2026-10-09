@@ -18,7 +18,7 @@ frontend/.next/
 frontend/out/
 frontend/.turbo/
 # data
-data/
+/data/
 pgdata/
 miniodata/
 # os/editor

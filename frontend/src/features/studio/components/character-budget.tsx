@@ -1,6 +1,6 @@
 "use client";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { PlatformIcon } from "@/components/data/platform-icon";
+import { PlatformIcon } from "@/components/shared/platform-icon";
 import { platformMeta } from "@/lib/platforms";
 import { cn } from "@/lib/utils";
 import { budgetFor, type BudgetLine } from "../platform-rules";
@@ -14,12 +14,12 @@ function Bar({ line }: { line: BudgetLine }) {
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">{line.label}{line.mode === "x_weighted" && " (weighted)"}{line.mode === "utf8_bytes" && " (bytes)"}</span>
-        <span className={cn("tabular-nums", line.over ? "font-semibold text-red-600" : near ? "text-amber-600" : "text-muted-foreground")}>
+        <span className={cn("tabular-nums", line.over ? "font-semibold text-destructive" : near ? "text-warning" : "text-muted-foreground")}>
           {fmt(line.used)}/{fmt(line.limit)} {line.over && <span className="sr-only">over limit</span>}
         </span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted" role="meter" aria-valuemin={0} aria-valuemax={line.limit} aria-valuenow={line.used} aria-label={`${line.label} characters`}>
-        <div className={cn("h-full rounded-full", line.over ? "bg-red-500" : near ? "bg-amber-500" : "bg-primary")} style={{ width: `${pct}%` }} />
+        <div className={cn("h-full rounded-full", line.over ? "bg-destructive" : near ? "bg-warning" : "bg-primary")} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
@@ -51,7 +51,7 @@ export function BudgetSummary({ entries, onSelect }: { entries: { platform: stri
           <>
             <PlatformIcon platform={e.platform} size={16} />
             <span className="tabular-nums">{fmt(main.used)}/{fmt(main.limit)}</span>
-            {over ? <XCircle className="h-3.5 w-3.5 text-red-600" aria-label="over limit" /> : <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" aria-label="within limit" />}
+            {over ? <XCircle className="h-3.5 w-3.5 text-destructive" aria-label="over limit" /> : <CheckCircle2 className="h-3.5 w-3.5 text-success" aria-label="within limit" />}
           </>
         );
         return e.id && onSelect
