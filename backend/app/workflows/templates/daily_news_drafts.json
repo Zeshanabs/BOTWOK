@@ -1,0 +1,32 @@
+{
+  "key": "daily_news_drafts",
+  "name": "Daily news watch → draft posts",
+  "description": "Every morning: scan yesterday's industry news, generate a few ideas and draft a post from the best one for review in the Studio (nothing is scheduled).",
+  "category": "content",
+  "order": 4,
+  "requires_autonomous_actions": false,
+  "params": {
+    "cron": {"type": "string", "default": "0 7 * * 1-5", "description": "When to run"},
+    "timezone": {"type": "string", "default": null, "description": "IANA timezone (default: the brand's)"},
+    "platform": {"type": "string", "default": "linkedin", "enum": ["linkedin", "facebook", "x", "threads", "instagram"], "description": "Platform of the draft"},
+    "idea_count": {"type": "integer", "default": 3, "description": "Ideas to generate"}
+  },
+  "workflow": {
+    "name": "Daily news watch → draft posts",
+    "settings": {"on_error": "notify", "max_cost_usd": 3},
+    "nodes": [
+      {"key": "t", "type": "trigger.cron", "label": "Weekday mornings", "position": {"x": 0, "y": 0}, "config": {"cron": "[[cron]]", "timezone": "[[timezone]]"}},
+      {"key": "news", "type": "research", "label": "Scan the news", "position": {"x": 0, "y": 120},
+       "config": {"query": "{{ brand.industry or brand.name }} news", "scope": ["news", "rss"], "depth": "quick", "recency_days": 2}},
+      {"key": "found", "type": "condition", "label": "Anything new?", "position": {"x": 0, "y": 240}, "config": {"expression": "steps.news.source_count > 0"}},
+      {"key": "ideas", "type": "generate", "label": "Ideas", "position": {"x": 0, "y": 360},
+       "config": {"kind": "ideas", "count": "[[idea_count]]", "platforms": ["[[platform]]"], "from": {"research_run_id": "{{ steps.news.research_run_id }}"}}},
+      {"key": "draft", "type": "generate", "label": "Draft a post", "position": {"x": 0, "y": 480},
+       "config": {"kind": "post", "platform": "[[platform]]", "idea": "{{ steps.ideas.idea_ids[0] }}", "content_type": "industry_news"}},
+      {"key": "notify", "type": "notification", "label": "Ask for review", "position": {"x": 0, "y": 600},
+       "config": {"title": "New draft to review: {{ steps.draft.title }}", "link": "/studio/{{ steps.draft.content_item_id }}", "severity": "info"}}
+    ],
+    "edges": [{"from": "t", "to": "news"}, {"from": "news", "to": "found"}, {"from": "found", "to": "ideas", "branch": "true"},
+              {"from": "ideas", "to": "draft"}, {"from": "draft", "to": "notify"}]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "key": "industry_news_linkedin",
+  "name": "Industry news → LinkedIn post",
+  "description": "When a news trend scores high enough, research it, generate 5 ideas, draft a LinkedIn post from the best one, get the post approved by a human, then schedule it at the best time.",
+  "category": "content",
+  "order": 1,
+  "requires_autonomous_actions": true,
+  "params": {
+    "min_score": {"type": "number", "default": 1.0, "description": "Minimum TREND_DETECTED score. Trend scores are z-score × credibility × brand relevance (typically 0–3); 1.0 ≈ a clearly rising, relevant topic from credible sources"},
+    "kinds": {"type": "array", "default": ["news"], "description": "Signal kinds the trend must include"},
+    "platform": {"type": "string", "default": "linkedin", "enum": ["linkedin", "facebook", "x", "threads", "instagram"], "description": "Platform of the drafted post"},
+    "approval_timeout_hours": {"type": "integer", "default": 48, "description": "Hours before the approval expires"}
+  },
+  "workflow": {
+    "name": "Industry news → LinkedIn post",
+    "description": "TREND_DETECTED (news, score ≥ [[min_score]]) → research → 5 ideas → [[platform]] post → approve → schedule at best time",
+    "settings": {"on_error": "notify", "max_cost_usd": 5},
+    "nodes": [
+      {"key": "t", "type": "trigger.event", "label": "News trend detected", "position": {"x": 0, "y": 0},
+       "config": {"event": "TREND_DETECTED", "filter": {"min_score": "[[min_score]]", "kinds": "[[kinds]]"}}},
+      {"key": "r", "type": "research", "label": "Research the story", "position": {"x": 0, "y": 120},
+       "config": {"query": "{{ trigger.trend.label }}", "scope": ["news", "web"], "depth": "standard", "recency_days": 7}},
+      {"key": "i", "type": "generate", "label": "Generate 5 ideas", "position": {"x": 0, "y": 240},
+       "config": {"kind": "ideas", "count": 5, "platforms": ["[[platform]]"],
+                  "from": {"research_run_id": "{{ steps.r.research_run_id }}", "trend_ids": ["{{ trigger.trend_id }}"]}}},
+      {"key": "p", "type": "generate", "label": "Draft the post", "position": {"x": 0, "y": 360},
+       "config": {"kind": "post", "platform": "[[platform]]", "idea": "{{ steps.i.idea_ids[0] }}", "content_type": "industry_news"}},
+      {"key": "a", "type": "approve", "label": "Human approval", "position": {"x": 0, "y": 480},
+       "config": {"content_item_id": "{{ steps.p.content_item_id }}", "title": "Approve: {{ steps.p.title }}",
+                  "approvers": {"roles": ["approver", "admin", "owner"]}, "timeout_hours": "[[approval_timeout_hours]]"}},
+      {"key": "s", "type": "schedule", "label": "Schedule at best time", "position": {"x": 0, "y": 600},
+       "config": {"variant": "{{ steps.p.variant_id }}", "account": "{{ brand.default_accounts.[[platform]] }}",
+                  "strategy": "best_time", "approval": "auto_if_content_approved"}},
+      {"key": "n", "type": "notification", "label": "Tell the team", "position": {"x": 260, "y": 600},
+       "config": {"title": "Automated draft '{{ steps.p.title }}' was not approved", "body": "{{ steps.a.comment }}", "severity": "warning"}}
+    ],
+    "edges": [
+      {"from": "t", "to": "r"}, {"from": "r", "to": "i"}, {"from": "i", "to": "p"}, {"from": "p", "to": "a"},
+      {"from": "a", "to": "s", "branch": "approved"}, {"from": "a", "to": "n", "branch": "rejected"}
+    ]
+  }
+}

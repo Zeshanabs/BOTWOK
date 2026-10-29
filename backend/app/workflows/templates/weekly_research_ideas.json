@@ -1,0 +1,43 @@
+{
+  "key": "weekly_research_ideas",
+  "name": "Weekly industry research → ideas to planner",
+  "description": "Every Monday morning: research your industry's news, sync competitors, detect trends, generate content ideas from the evidence and put them in this week's planner, then notify the team (doc 31 Scenario B).",
+  "category": "research",
+  "order": 2,
+  "requires_autonomous_actions": false,
+  "params": {
+    "cron": {"type": "string", "default": "0 9 * * 1", "description": "When to run (5-field cron)"},
+    "timezone": {"type": "string", "default": null, "description": "IANA timezone (default: the brand's)"},
+    "idea_count": {"type": "integer", "default": 10, "description": "How many ideas to generate"},
+    "research_query": {"type": "string", "default": "{{ brand.industry or brand.name }} industry news", "description": "Research query (templated)"},
+    "recency_days": {"type": "integer", "default": 7, "description": "Only sources from the last N days"}
+  },
+  "workflow": {
+    "name": "Weekly industry research → ideas to planner",
+    "settings": {"on_error": "notify", "max_cost_usd": 10},
+    "nodes": [
+      {"key": "t", "type": "trigger.cron", "label": "Every Monday 09:00", "position": {"x": 0, "y": 0},
+       "config": {"cron": "[[cron]]", "timezone": "[[timezone]]"}},
+      {"key": "research", "type": "research", "label": "Research industry news", "position": {"x": 0, "y": 120},
+       "config": {"query": "[[research_query]]", "scope": ["news", "rss", "web"], "depth": "standard", "recency_days": "[[recency_days]]"}},
+      {"key": "competitors", "type": "action", "label": "Sync competitors", "position": {"x": 0, "y": 240},
+       "config": {"action": "competitors.sync", "params": {}}},
+      {"key": "trends", "type": "ai_agent", "label": "Detect trends", "position": {"x": 0, "y": 360},
+       "config": {"agent": "trend", "action": "detect", "inputs": {"industry": "{{ brand.industry }}", "window_days": 14}}},
+      {"key": "ideas", "type": "generate", "label": "Generate ideas", "position": {"x": 0, "y": 480},
+       "config": {"kind": "ideas", "count": "[[idea_count]]",
+                  "from": {"research_run_id": "{{ steps.research.research_run_id }}", "trends": "{{ steps.trends.output }}",
+                           "competitor_sync": "{{ steps.competitors.result }}"}}},
+      {"key": "planner", "type": "action", "label": "Add to planner", "position": {"x": 0, "y": 600},
+       "config": {"action": "ideas.add_to_planner", "params": {"idea_ids": "{{ steps.ideas.idea_ids }}"}}},
+      {"key": "notify", "type": "notification", "label": "Notify the team", "position": {"x": 0, "y": 720},
+       "config": {"title": "{{ steps.ideas.count }} new ideas for week {{ steps.planner.planner_week }}",
+                  "body": "Weekly research found {{ steps.research.source_count }} sources; the ideas are in your planner.",
+                  "link": "/ideas?week={{ steps.planner.planner_week }}", "severity": "success"}}
+    ],
+    "edges": [
+      {"from": "t", "to": "research"}, {"from": "research", "to": "competitors"}, {"from": "competitors", "to": "trends"},
+      {"from": "trends", "to": "ideas"}, {"from": "ideas", "to": "planner"}, {"from": "planner", "to": "notify"}
+    ]
+  }
+}
