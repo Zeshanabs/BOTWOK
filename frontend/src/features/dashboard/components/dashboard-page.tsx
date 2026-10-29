@@ -45,7 +45,7 @@ function ActionTile({ icon: Icon, title, hint, onClick, tone = "primary" }: { ic
       onClick={onClick}
       className="card-interactive group flex items-center gap-3 rounded-xl border bg-card px-3.5 py-3 text-left shadow-card focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
-      <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", tone === "ai" ? "bg-ai/12 text-ai" : "bg-primary/10 text-primary")}><Icon className="h-4 w-4" /></span>
+      <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105", tone === "ai" ? "bg-ai/12 text-ai" : "bg-primary/10 text-primary")}><Icon className="h-4 w-4" /></span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold">{title}</span>
         <span className="block truncate text-xs text-muted-foreground">{hint}</span>
@@ -108,16 +108,24 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <header className="relative isolate flex flex-col gap-4 overflow-hidden rounded-2xl border bg-gradient-to-br from-primary/[0.08] via-card to-card px-5 py-5 shadow-card sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-6">
+        <div className="pointer-events-none absolute -right-12 -top-20 -z-10 h-52 w-52 rounded-full bg-primary/[0.09] blur-3xl" aria-hidden />
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{brand ? brand.name : "Dashboard"} · {keyLabel(today, { weekday: "long", month: "long", day: "numeric" })}</p>
-          <h1 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-[28px]">{greeting()}{firstName ? `, ${firstName}` : ""}.</h1>
+          <p className="inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-background/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
+            {brand ? brand.name : "Dashboard"}
+            <span className="text-muted-foreground/50" aria-hidden>·</span>
+            {keyLabel(today, { weekday: "long", month: "long", day: "numeric" })}
+          </p>
+          <h1 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-[30px]">{greeting()}{firstName ? `, ${firstName}` : ""}.</h1>
           <p className="mt-1 text-sm text-muted-foreground">What needs action, what goes out next, how content performs.</p>
         </div>
-        <Select value={days} onValueChange={setDays}>
-          <SelectTrigger size="sm" className="w-40 bg-card" aria-label="Period"><SelectValue /></SelectTrigger>
-          <SelectContent><SelectItem value="7">Last 7 days</SelectItem><SelectItem value="30">Last 30 days</SelectItem><SelectItem value="90">Last 90 days</SelectItem></SelectContent>
-        </Select>
+        <div className="relative shrink-0">
+          <Select value={days} onValueChange={setDays}>
+            <SelectTrigger size="sm" className="w-40 border bg-background/80 shadow-card" aria-label="Period"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="7">Last 7 days</SelectItem><SelectItem value="30">Last 30 days</SelectItem><SelectItem value="90">Last 90 days</SelectItem></SelectContent>
+          </Select>
+        </div>
       </header>
 
       {/* Quick actions */}
